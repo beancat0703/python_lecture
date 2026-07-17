@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HW01 — bean_cat's Python Lecture</title>
+    <style>
+        /* ===== Reset & Base ===== */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --sidebar-width: 260px;
+            --topbar-height: 56px;
+            --gray-50:  #f8f9fa;
+            --gray-100: #f0f1f3;
+            --gray-200: #e2e4e7;
+            --gray-300: #cdd0d5;
+            --gray-400: #aeb3ba;
+            --gray-500: #858c94;
+            --gray-600: #5f666f;
+            --gray-700: #3d4248;
+            --gray-800: #2a2e33;
+            --gray-900: #1a1c1f;
+            --accent:   #3a5a8c;
+            --accent-light: #e8edf4;
+            --font-serif: 'Noto Serif SC', 'Source Han Serif SC', 'STSong', 'SimSun', 'Songti SC', 'NSimSun', 'FangSong', serif;
+            --font-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', 'Cascadia Code', 'Menlo', 'Monaco', 'Consolas', monospace;
+            --font-sans:  -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            color: var(--gray-900);
+            background: var(--gray-50);
+            line-height: 1.7;
+            min-height: 100vh;
+        }
+
+        /* ===== Top Bar ===== */
+        .topbar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: var(--topbar-height);
+            background: var(--gray-700);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            padding: 0 28px;
+            z-index: 100;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+        }
+        .topbar .brand {
+            font-family: var(--font-mono);
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            color: #e8e8e8;
+        }
+        .topbar .brand span {
+            color: #8db5e6;
+        }
+
+        /* ===== Sidebar ===== */
+        .sidebar {
+            position: fixed;
+            top: var(--topbar-height);
+            left: 0;
+            bottom: 0;
+            width: var(--sidebar-width);
+            background: #fff;
+            border-right: 1px solid var(--gray-200);
+            overflow-y: auto;
+            padding: 24px 0;
+            z-index: 90;
+        }
+        .sidebar .toc-header {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--gray-500);
+            padding: 0 24px 16px;
+        }
+        .sidebar .toc-list {
+            list-style: none;
+        }
+        .sidebar .toc-list li a {
+            display: block;
+            padding: 8px 24px;
+            font-size: 14px;
+            color: var(--gray-700);
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: all 0.15s ease;
+        }
+        .sidebar .toc-list li a:hover {
+            background: var(--gray-100);
+            color: var(--gray-900);
+        }
+        .sidebar .toc-list li a.active {
+            border-left-color: var(--accent);
+            background: var(--accent-light);
+            color: var(--accent);
+            font-weight: 600;
+        }
+        .sidebar .toc-list li a .toc-num {
+            display: inline-block;
+            width: 22px;
+            font-weight: 700;
+            color: var(--accent);
+            font-size: 12px;
+        }
+
+        /* ===== Main ===== */
+        .main {
+            margin-left: var(--sidebar-width);
+            margin-top: var(--topbar-height);
+            padding: 40px 52px 80px;
+            max-width: 960px;
+        }
+
+        /* ===== Content Styles ===== */
+        .lecture-title {
+            font-family: var(--font-serif);
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+        .lecture-subtitle {
+            font-size: 14px;
+            color: var(--gray-500);
+            margin-bottom: 40px;
+            font-weight: 400;
+        }
+
+        .section {
+            margin-bottom: 44px;
+        }
+        .section h2 {
+            font-family: var(--font-serif);
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 18px;
+            padding-bottom: 10px;
+            border-bottom: 1.5px solid var(--gray-200);
+        }
+        .section h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin: 20px 0 10px;
+        }
+        .section p, .section li {
+            font-size: 15px;
+            color: var(--gray-800);
+            margin-bottom: 8px;
+        }
+        .section ul, .section ol {
+            margin-left: 24px;
+            margin-bottom: 12px;
+        }
+        .section ul li, .section ol li {
+            margin-bottom: 4px;
+        }
+
+        /* ===== Info/Callout Boxes ===== */
+        .callout {
+            border-radius: 6px;
+            padding: 14px 18px;
+            margin: 16px 0;
+            font-size: 14px;
+            line-height: 1.65;
+        }
+        .callout-note {
+            background: #e8f0fe;
+            border: 1px solid #b8d4fe;
+            color: #1a3a5c;
+        }
+        .callout-note .callout-title {
+            color: #1a4a7a;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        .callout-hint {
+            background: #edf7ed;
+            border: 1px solid #b7d7b7;
+            color: #2e5a2e;
+        }
+        .callout-hint .callout-title {
+            color: #2e5a2e;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        .callout-warn {
+            background: #fff8e8;
+            border: 1px solid #e8d5a0;
+            color: #5c4a1a;
+        }
+        .callout-warn .callout-title {
+            color: #7a5a1a;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        /* ===== Code Block ===== */
+        .code-block {
+            background: #1e1e2e;
+            border-radius: 6px;
+            padding: 14px 20px;
+            margin: 12px 0;
+            overflow-x: auto;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+        }
+        .code-block code {
+            font-family: var(--font-mono);
+            font-size: 13.5px;
+            color: #cdd6f4;
+            line-height: 1.6;
+            white-space: pre;
+        }
+        .code-block .kw  { color: #cba6f7; }
+        .code-block .fn  { color: #89b4fa; }
+        .code-block .str { color: #a6e3a1; }
+        .code-block .num { color: #fab387; }
+        .code-block .op  { color: #94e2d5; }
+        .code-block .cmt { color: #6c7086; }
+        .code-block .blk { color: #cdd6f4; }
+        .code-block .prompt { color: #a6e3a1; }
+
+        /* Inline code */
+        :not(.code-block) > code,
+        p code, li code, .callout code {
+            background: var(--gray-100);
+            color: #c44;
+            font-family: var(--font-mono);
+            font-size: 13px;
+            padding: 1.5px 6px;
+            border-radius: 3px;
+            border: 1px solid var(--gray-200);
+        }
+
+        /* ===== Buttons & Links ===== */
+        .download-btn {
+            display: inline-block;
+            background: var(--accent);
+            color: #fff;
+            padding: 8px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            margin: 8px 0 16px;
+            transition: background 0.15s;
+        }
+        .download-btn:hover {
+            background: #2a4a7c;
+        }
+
+        /* ===== Score Check ===== */
+        .score-section {
+            background: #f5f0ff;
+            border: 1px solid #d4c8f0;
+            border-radius: 6px;
+            padding: 16px 20px;
+            margin: 20px 0;
+        }
+        .score-section p {
+            margin-bottom: 6px;
+        }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .main {
+                margin-left: 0;
+                padding: 24px 20px 60px;
+            }
+        }
+
+        /* ===== Print ===== */
+        @media print {
+            .sidebar, .topbar { display: none; }
+            .main { margin: 0; padding: 20px 0; }
+            .code-block { box-shadow: none; border: 1px solid #ccc; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Top Bar -->
+<header class="topbar">
+    <div class="brand"><span>bean_cat</span>'s Python Lecture</div>
+</header>
+
+<!-- Sidebar -->
+<nav class="sidebar">
+    <div class="toc-header">目录 Contents</div>
+    <ul class="toc-list">
+        <li>
+            <a href="index.html">
+                <span class="toc-num">00</span> Lab 0 — 环境配置
+            </a>
+        </li>
+        <li>
+            <a href="hw01.html" class="active">
+                <span class="toc-num">01</span> HW01 — Functions &amp; Control
+            </a>
+        </li>
+    </ul>
+</nav>
+
+<!-- Main Content -->
+<main class="main">
+
+    <!-- Title -->
+    <h1 class="lecture-title">Homework 1: Functions, Control, Higher-Order Functions</h1>
+    <p class="lecture-subtitle">
+        题目来源：CS 61A Summer 2026 —
+        <a href="https://cs61a.org/hw/hw01/" target="_blank" rel="noopener">https://cs61a.org/hw/hw01/</a>
+    </p>
+
+    <a class="download-btn" href="hw01.zip" download>&#x1f4e5; 下载 hw01.zip</a>
+
+    <!-- ============================================================ -->
+    <section class="section" id="required">
+        <h2>必做题 (Required Questions)</h2>
+
+        <!-- Q1 -->
+        <h3 id="q1">Q1: A Plus Abs B</h3>
+
+        <p>Python 的 <code>operator</code> 模块包含双参数函数，如 <code>add</code> 和 <code>sub</code>，对应 Python 内置的算术运算符。例如，<code>add(2, 3)</code> 求值为 5，与表达式 <code>2 + 3</code> 一样。</p>
+
+        <p>在以下函数中填入空白，实现将 <code>a</code> 与 <code>b</code> 的绝对值相加，但<strong>不能</strong>调用 <code>abs</code> 函数。除了两个空白外，<strong>不得</strong>修改任何已有代码。</p>
+
+        <div class="code-block"><code><span class="kw">def</span> <span class="fn">a_plus_abs_b</span>(a, b):
+    <span class="str">"""Return a+abs(b), but without calling abs.
+
+    >>> a_plus_abs_b(2, 3)
+    5
+    >>> a_plus_abs_b(2, -3)
+    5
+    >>> a_plus_abs_b(-1, 4)
+    3
+    >>> a_plus_abs_b(-1, -4)
+    3
+    """</span>
+    <span class="kw">if</span> b &lt; 0:
+        f = _____
+    <span class="kw">else</span>:
+        f = _____
+    <span class="kw">return</span> f(a, b)</code></div>
+
+        <p>使用 Ok 测试代码：</p>
+        <div class="code-block"><code><span class="prompt">$</span> python3 ok -q a_plus_abs_b</code></div>
+
+        <p>使用 Ok 运行本地语法检查（检查你是否未修改除两个空白之外的任何代码）：</p>
+        <div class="code-block"><code><span class="prompt">$</span> python3 ok -q a_plus_abs_b_syntax_check</code></div>
+
+        <!-- Q2 -->
+        <h3 id="q2">Q2: Hailstone</h3>
+
+        <p>Douglas Hofstadter 的普利策奖获奖著作 <em>Gödel, Escher, Bach</em> 中提出了以下数学谜题：</p>
+
+        <ol>
+            <li>选择一个正整数 <em>n</em> 作为起始值。</li>
+            <li>如果 <em>n</em> 是偶数，将其除以 2。</li>
+            <li>如果 <em>n</em> 是奇数，将其乘以 3 再加 1。</li>
+            <li>持续这个过程，直到 <em>n</em> 变为 1。</li>
+        </ol>
+
+        <p>数字 <em>n</em> 会上下波动，但最终都会变为 1（至少对所有曾尝试过的数字都是如此——尽管没有人证明过该序列一定会终止）。类似地，冰雹（hailstone）在大气中上下运动，最终落回地面。</p>
+
+        <p>这种 <em>n</em> 的值序列通常被称为 Hailstone 序列。请编写一个函数，接收一个形参名为 <code>n</code> 的参数，打印从 <em>n</em> 开始的 hailstone 序列，并返回序列的步数：</p>
+
+        <div class="code-block"><code><span class="kw">def</span> <span class="fn">hailstone</span>(n):
+    <span class="str">"""Print the hailstone sequence starting at n and return its
+    length.
+
+    >>> a = hailstone(10)
+    10
+    5
+    16
+    8
+    4
+    2
+    1
+    >>> a
+    7
+    >>> b = hailstone(1)
+    1
+    >>> b
+    1
+    """</span>
+    <span class="str">"*** YOUR CODE HERE ***"</span></code></div>
+
+        <p>Hailstone 序列可以非常长！试试 27。你能找到的最长序列是多少？</p>
+
+        <div class="callout callout-note">
+            <div class="callout-title">&#x26A0; 注意</div>
+            如果初始时 <em>n</em> = 1，则序列的长度为 1 步。<br>
+            <strong>提示：</strong> 如果你看到 4.0 但想要 4，尝试使用地板除法 <code>//</code> 而不是普通除法 <code>/</code>。
+        </div>
+
+        <p>使用 Ok 测试代码：</p>
+        <div class="code-block"><code><span class="prompt">$</span> python3 ok -q hailstone</code></div>
+
+        <p><strong>对 hailstone 序列感兴趣？看看这篇文章：</strong></p>
+        <ul>
+            <li>2019 年，在理解 hailstone 猜想对大多数数字的适用性方面取得了重大
+                <a href="https://www.quantamagazine.org/mathematician-terence-tao-and-the-collatz-conjecture-20191211/" target="_blank" rel="noopener">进展</a>！
+            </li>
+        </ul>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="section" id="hof">
+        <h2>Higher-Order Functions</h2>
+
+        <!-- Q3 -->
+        <h3 id="q3">Q3: Product</h3>
+
+        <p>编写一个名为 <code>product</code> 的函数，返回一个序列前 <em>n</em> 项的乘积。具体来说，<code>product</code> 接收一个整数 <em>n</em> 和 <code>term</code>（一个单参数函数，用于确定一个序列——即 <code>term(i)</code> 给出该序列的第 <em>i</em> 项）。<code>product(n, term)</code> 应返回 term(1) &times; ... &times; term(n)。</p>
+
+        <div class="code-block"><code><span class="kw">def</span> <span class="fn">product</span>(n, term):
+    <span class="str">"""Return the product of the first n terms in a sequence.
+
+    n: a positive integer
+    term: a function that takes an index as input and produces a term
+
+    >>> product(3, identity)  # 1 * 2 * 3
+    6
+    >>> product(5, identity)  # 1 * 2 * 3 * 4 * 5
+    120
+    >>> product(3, square)    # 1^2 * 2^2 * 3^2
+    36
+    >>> product(5, square)    # 1^2 * 2^2 * 3^2 * 4^2 * 5^2
+    14400
+    >>> product(3, increment) # (1+1) * (2+1) * (3+1)
+    24
+    >>> product(3, triple)    # 1*3 * 2*3 * 3*3
+    162
+    """</span>
+    <span class="str">"*** YOUR CODE HERE ***"</span></code></div>
+
+        <p>使用 Ok 测试代码：</p>
+        <div class="code-block"><code><span class="prompt">$</span> python3 ok -q product</code></div>
+
+        <!-- Q4 -->
+        <h3 id="q4">Q4: Make Repeater</h3>
+
+        <p>实现函数 <code>make_repeater</code>，它接收一个单参数函数 <em>f</em> 和一个正整数 <em>n</em>。它返回一个单参数函数，使得 <code>make_repeater(f, n)(x)</code> 返回将 <em>f</em> 应用于 <em>x</em> 共 <em>n</em> 次的值，即 <em>f</em>(<em>f</em>(...<em>f</em>(<em>x</em>)...))。例如，<code>make_repeater(square, 3)(5)</code> 对 5 进行三次平方运算并返回 390625，就像 <code>square(square(square(5)))</code> 一样。</p>
+
+        <div class="code-block"><code><span class="kw">def</span> <span class="fn">make_repeater</span>(f, n):
+    <span class="str">"""Returns the function that computes the nth application of f.
+
+    >>> add_three = make_repeater(increment, 3)
+    >>> add_three(5)
+    8
+    >>> make_repeater(triple, 5)(1) # 3 * (3 * (3 * (3 * (3 * 1))))
+    243
+    >>> make_repeater(square, 2)(5) # square(square(5))
+    625
+    >>> make_repeater(square, 3)(5) # square(square(square(5)))
+    390625
+    """</span>
+    <span class="str">"*** YOUR CODE HERE ***"</span></code></div>
+
+        <p>使用 Ok 测试代码：</p>
+        <div class="code-block"><code><span class="prompt">$</span> python3 ok -q make_repeater</code></div>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="section" id="score">
+        <h2>本地检查分数 (Check Your Score Locally)</h2>
+
+        <p>你可以通过运行以下命令在本地检查每道题目的得分：</p>
+
+        <div class="code-block"><code><span class="prompt">$</span> python3 ok --score</code></div>
+
+        <p><strong>这不会提交作业！</strong> 当你对分数满意后，将作业提交到 Gradescope 以获得学分。</p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="section" id="optional">
+        <h2>选做题 (Optional Questions)</h2>
+
+        <!-- Q5 -->
+        <h3 id="q5">Q5: Largest Factor</h3>
+
+        <p>编写一个函数，接收一个<strong>大于 1</strong> 的整数 <em>n</em>，返回小于 <em>n</em> 且能整除 <em>n</em> 的最大整数。</p>
+
+        <div class="code-block"><code><span class="kw">def</span> <span class="fn">largest_factor</span>(n):
+    <span class="str">"""Return the largest factor of n that is smaller than n.
+
+    >>> largest_factor(15) # factors are 1, 3, 5
+    5
+    >>> largest_factor(80) # factors are 1, 2, 4, 5, 8, 10, 16, 20, 40
+    40
+    >>> largest_factor(13) # factors are 1, 13
+    1
+    """</span>
+    <span class="str">"*** YOUR CODE HERE ***"</span></code></div>
+
+        <div class="callout callout-hint">
+            <div class="callout-title">&#x1F4A1; 提示</div>
+            要检查 <em>b</em> 是否能整除 <em>a</em>，使用表达式 <code>a % b == 0</code>，可以解读为「<em>a</em> 除以 <em>b</em> 的余数为 0」。
+        </div>
+
+        <p>使用 Ok 测试代码：</p>
+        <div class="code-block"><code><span class="prompt">$</span> python3 ok -q largest_factor</code></div>
+
+        <!-- Q6 -->
+        <h3 id="q6">Q6: Accumulate</h3>
+
+        <p>让我们来看看 <code>product</code> 如何是一个更通用的函数 <code>accumulate</code> 的特例，我们需要实现它：</p>
+
+        <div class="code-block"><code><span class="kw">def</span> <span class="fn">accumulate</span>(fuse, start, n, term):
+    <span class="str">"""Return the result of fusing together the first n terms in a sequence
+    and start.  The terms to be fused are term(1), term(2), ..., term(n).
+    The function fuse is a two-argument commutative & associative function.
+
+    >>> accumulate(add, 0, 5, identity)  # 0 + 1 + 2 + 3 + 4 + 5
+    15
+    >>> accumulate(add, 11, 5, identity) # 11 + 1 + 2 + 3 + 4 + 5
+    26
+    >>> accumulate(add, 11, 0, identity) # 11 (fuse is never used)
+    11
+    >>> accumulate(add, 11, 3, square)   # 11 + 1^2 + 2^2 + 3^2
+    25
+    >>> accumulate(mul, 2, 3, square)    # 2 * 1^2 * 2^2 * 3^2
+    72
+    >>> # 2 + (1^2 + 1) + (2^2 + 1) + (3^2 + 1)
+    >>> accumulate(lambda x, y: x + y + 1, 2, 3, square)
+    19
+    """</span>
+    <span class="str">"*** YOUR CODE HERE ***"</span></code></div>
+
+        <p><code>accumulate</code> 具有以下参数：</p>
+
+        <ul>
+            <li><code>fuse</code>：一个双参数函数，指定如何将当前项与之前累积的项融合在一起</li>
+            <li><code>start</code>：开始累积的初始值</li>
+            <li><code>n</code>：一个非负整数，表示要融合的项数</li>
+            <li><code>term</code>：一个单参数函数；<code>term(i)</code> 是序列的第 <em>i</em> 项</li>
+        </ul>
+
+        <p>实现 <code>accumulate</code>，使用 <code>fuse</code> 函数将由 <code>term</code> 定义的序列的前 <em>n</em> 项与 <code>start</code> 值融合在一起。</p>
+
+        <p>例如，<code>accumulate(add, 11, 3, square)</code> 的结果是：</p>
+        <div class="code-block"><code>add(11,  add(square(1), add(square(2),  square(3)))) =
+    11 +     square(1) +    square(2) + square(3)    =
+    11 +     1         +    4         + 9            = 25</code></div>
+
+        <div class="callout callout-warn">
+            <div class="callout-title">&#x26A0; 假设</div>
+            假设 <code>fuse</code> 是交换的，即 <code>fuse(a, b) == fuse(b, a)</code>，并且是结合的，即 <code>fuse(fuse(a, b), c) == fuse(a, fuse(b, c))</code>。
+        </div>
+
+        <p>使用 Ok 测试代码：</p>
+        <div class="code-block"><code><span class="prompt">$</span> python3 ok -q accumulate</code></div>
+
+        <p>然后，将 <code>summation_using_accumulate</code> 和 <code>product_using_accumulate</code> 实现为对 <code>accumulate</code> 的<strong>一行调用</strong>。</p>
+
+        <div class="callout callout-note">
+            <div class="callout-title">&#x26A0; 重要</div>
+            <code>summation_using_accumulate</code> 和 <code>product_using_accumulate</code> 都应仅用一行代码实现，以 <code>return</code> 开头。
+        </div>
+
+        <div class="code-block"><code><span class="kw">def</span> <span class="fn">summation_using_accumulate</span>(n, term):
+    <span class="str">"""Returns the sum: term(1) + ... + term(n), using accumulate.
+
+    >>> summation_using_accumulate(5, square)
+    55
+    >>> summation_using_accumulate(5, triple)
+    45
+    >>> # This test checks that the body of the function is just a return statement.
+    >>> import inspect, ast
+    >>> [type(x).__name__ for x in ast.parse(inspect.getsource(summation_using_accumulate)).body[0].body]
+    ['Expr', 'Return']
+    """</span>
+    <span class="kw">return</span> ____
+
+<span class="kw">def</span> <span class="fn">product_using_accumulate</span>(n, term):
+    <span class="str">"""Returns the product: term(1) * ... * term(n), using accumulate.
+
+    >>> product_using_accumulate(4, square)
+    576
+    >>> product_using_accumulate(6, triple)
+    524880
+    >>> # This test checks that the body of the function is just a return statement.
+    >>> import inspect, ast
+    >>> [type(x).__name__ for x in ast.parse(inspect.getsource(product_using_accumulate)).body[0].body]
+    ['Expr', 'Return']
+    """</span>
+    <span class="kw">return</span> ____</code></div>
+
+        <p>使用 Ok 测试代码：</p>
+        <div class="code-block"><code><span class="prompt">$</span> python3 ok -q summation_using_accumulate
+<span class="prompt">$</span> python3 ok -q product_using_accumulate</code></div>
+    </section>
+
+</main>
+
+</body>
+</html>
