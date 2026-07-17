@@ -306,7 +306,7 @@
         </li>
         <li>
             <a href="hw01.html" class="active">
-                <span class="toc-num">01</span> HW01 — Functions &amp; Control
+                <span class="toc-num">01</span> HW01 — Functions, Control, Higher-Order Functions
             </a>
         </li>
     </ul>
@@ -323,6 +323,10 @@
     </p>
 
     <a class="download-btn" href="hw01.zip" download>&#x1f4e5; 下载 hw01.zip</a>
+
+    <div class="callout callout-note">
+        <strong>&#x1F4A1; 提示：</strong> 下载并解压后，用 VS Code <strong>打开 hw01 文件夹</strong>（点击 <code>文件</code> → <code>打开文件夹...</code>，选择 hw01 文件夹），而不是单独打开某个 .py 文件。这样才能在终端中正确运行 Ok 评测命令。
+    </div>
 
     <!-- ============================================================ -->
     <section class="section" id="required">
@@ -355,6 +359,10 @@
 
         <p>使用 Ok 测试代码：</p>
         <div class="code-block"><code><span class="prompt">$</span> python3 ok -q a_plus_abs_b</code></div>
+
+        <div class="callout callout-note">
+            <strong>&#x26A0; 注意：</strong> 第一次使用 Ok 评测时，终端可能会提示你输入邮箱账号。请输入你的学校邮箱（以 <code>@berkeley.edu</code> 结尾的邮箱）来完成 Ok 的初始化配置。后续再次使用 Ok 时就不会再出现这个提示了。
+        </div>
 
         <p>使用 Ok 运行本地语法检查（检查你是否未修改除两个空白之外的任何代码）：</p>
         <div class="code-block"><code><span class="prompt">$</span> python3 ok -q a_plus_abs_b_syntax_check</code></div>
@@ -479,8 +487,6 @@
         <p>你可以通过运行以下命令在本地检查每道题目的得分：</p>
 
         <div class="code-block"><code><span class="prompt">$</span> python3 ok --score</code></div>
-
-        <p><strong>这不会提交作业！</strong> 当你对分数满意后，将作业提交到 Gradescope 以获得学分。</p>
     </section>
 
     <!-- ============================================================ -->
