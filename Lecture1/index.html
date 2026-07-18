@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lecture 1 — bean_cat's Python Lecture</title>
+    <style>
+        /* ===== Reset & Base ===== */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --sidebar-width: 260px;
+            --topbar-height: 56px;
+            --gray-50:  #f8f9fa;
+            --gray-100: #f0f1f3;
+            --gray-200: #e2e4e7;
+            --gray-300: #cdd0d5;
+            --gray-400: #aeb3ba;
+            --gray-500: #858c94;
+            --gray-600: #5f666f;
+            --gray-700: #3d4248;
+            --gray-800: #2a2e33;
+            --gray-900: #1a1c1f;
+            --accent:   #3a5a8c;
+            --accent-light: #e8edf4;
+            --font-serif: 'Noto Serif SC', 'Source Han Serif SC', 'STSong', 'SimSun', 'Songti SC', 'NSimSun', 'FangSong', serif;
+            --font-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', 'Cascadia Code', 'Menlo', 'Monaco', 'Consolas', monospace;
+            --font-sans:  -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            color: var(--gray-900);
+            background: var(--gray-50);
+            line-height: 1.7;
+            min-height: 100vh;
+        }
+
+        /* ===== Top Bar ===== */
+        .topbar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: var(--topbar-height);
+            background: var(--gray-700);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            padding: 0 28px;
+            z-index: 100;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+        }
+        .topbar .brand {
+            font-family: var(--font-mono);
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            color: #e8e8e8;
+        }
+        .topbar .brand span {
+            color: #8db5e6;
+        }
+
+        /* ===== Sidebar ===== */
+        .sidebar {
+            position: fixed;
+            top: var(--topbar-height);
+            left: 0;
+            bottom: 0;
+            width: var(--sidebar-width);
+            background: #fff;
+            border-right: 1px solid var(--gray-200);
+            overflow-y: auto;
+            padding: 24px 0;
+            z-index: 90;
+        }
+        .sidebar .toc-header {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--gray-500);
+            padding: 0 24px 16px;
+        }
+        .sidebar .toc-list {
+            list-style: none;
+        }
+        .sidebar .toc-list li a {
+            display: block;
+            padding: 8px 24px;
+            font-size: 14px;
+            color: var(--gray-700);
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: all 0.15s ease;
+        }
+        .sidebar .toc-list li a:hover {
+            background: var(--gray-100);
+            color: var(--gray-900);
+        }
+        .sidebar .toc-list li a.active {
+            border-left-color: var(--accent);
+            background: var(--accent-light);
+            color: var(--accent);
+            font-weight: 600;
+        }
+        .sidebar .toc-list li a .toc-num {
+            display: inline-block;
+            width: 22px;
+            font-weight: 700;
+            color: var(--accent);
+            font-size: 12px;
+        }
+
+        /* ===== Main ===== */
+        .main {
+            margin-left: var(--sidebar-width);
+            margin-top: var(--topbar-height);
+            padding: 40px 52px 80px;
+            max-width: 960px;
+        }
+
+        /* ===== Content Styles ===== */
+        .lecture-title {
+            font-family: var(--font-serif);
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+        .lecture-subtitle {
+            font-size: 14px;
+            color: var(--gray-500);
+            margin-bottom: 40px;
+            font-weight: 400;
+        }
+
+        .section {
+            margin-bottom: 44px;
+        }
+        .section h2 {
+            font-family: var(--font-serif);
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 18px;
+            padding-bottom: 10px;
+            border-bottom: 1.5px solid var(--gray-200);
+        }
+        .section h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin: 20px 0 10px;
+        }
+        .section p, .section li {
+            font-size: 15px;
+            color: var(--gray-800);
+            margin-bottom: 8px;
+        }
+        .section ul, .section ol {
+            margin-left: 24px;
+            margin-bottom: 12px;
+        }
+        .section ul li, .section ol li {
+            margin-bottom: 4px;
+        }
+
+        /* ===== Info/Callout Boxes ===== */
+        .callout {
+            border-radius: 6px;
+            padding: 14px 18px;
+            margin: 16px 0;
+            font-size: 14px;
+            line-height: 1.65;
+        }
+        .callout-note {
+            background: #e8f0fe;
+            border: 1px solid #b8d4fe;
+            color: #1a3a5c;
+        }
+        .callout-hint {
+            background: #edf7ed;
+            border: 1px solid #b7d7b7;
+            color: #2e5a2e;
+        }
+        .callout-warn {
+            background: #fff8e8;
+            border: 1px solid #e8d5a0;
+            color: #5c4a1a;
+        }
+        .callout-key {
+            background: #f5f0ff;
+            border: 1px solid #d4c8f0;
+            color: #3a2a5c;
+        }
+
+        /* ===== Code Block ===== */
+        .code-block {
+            background: #1e1e2e;
+            border-radius: 6px;
+            padding: 14px 20px;
+            margin: 12px 0;
+            overflow-x: auto;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+        }
+        .code-block code {
+            font-family: var(--font-mono);
+            font-size: 13.5px;
+            color: #cdd6f4;
+            line-height: 1.6;
+            white-space: pre;
+        }
+        .code-block .kw  { color: #cba6f7; }
+        .code-block .fn  { color: #89b4fa; }
+        .code-block .str-color { color: #a6e3a1; }
+        .code-block .num { color: #fab387; }
+        .code-block .op  { color: #94e2d5; }
+        .code-block .cmt { color: #6c7086; }
+        .code-block .prompt { color: #a6e3a1; }
+
+        /* Inline code */
+        :not(.code-block) > code,
+        p code, li code, .callout code {
+            background: var(--gray-100);
+            color: #c44;
+            font-family: var(--font-mono);
+            font-size: 13px;
+            padding: 1.5px 6px;
+            border-radius: 3px;
+            border: 1px solid var(--gray-200);
+        }
+
+        /* ===== Buttons & Links ===== */
+        .download-btn {
+            display: inline-block;
+            background: var(--accent);
+            color: #fff;
+            padding: 8px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            margin: 8px 0 16px;
+            transition: background 0.15s;
+        }
+        .download-btn:hover {
+            background: #2a4a7c;
+        }
+
+        /* ===== Figure ===== */
+        .figure {
+            text-align: center;
+            margin: 24px 0;
+        }
+        .figure img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 6px;
+            border: 1px solid var(--gray-200);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .figure .caption {
+            display: block;
+            margin-top: 8px;
+            font-size: 13px;
+            color: var(--gray-500);
+            font-style: italic;
+        }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .main {
+                margin-left: 0;
+                padding: 24px 20px 60px;
+            }
+        }
+
+        /* ===== Print ===== */
+        @media print {
+            .sidebar, .topbar { display: none; }
+            .main { margin: 0; padding: 20px 0; }
+            .code-block { box-shadow: none; border: 1px solid #ccc; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Top Bar -->
+<header class="topbar">
+    <div class="brand"><span>bean_cat</span>'s Python Lecture</div>
+</header>
+
+<!-- Sidebar -->
+<nav class="sidebar">
+    <div class="toc-header">目录 Contents</div>
+    <ul class="toc-list">
+        <li>
+            <a href="../index.html">
+                <span class="toc-num">00</span> Lab 0 — 环境配置
+            </a>
+        </li>
+        <li>
+            <a href="index.html" class="active">
+                <span class="toc-num">L1</span> Lecture 1 — Python 基础
+            </a>
+        </li>
+        <li>
+            <a href="../hw01.html">
+                <span class="toc-num">01</span> HW01 — Functions, Control, HOF
+            </a>
+        </li>
+    </ul>
+</nav>
+
+<!-- Main Content -->
+<main class="main">
+
+    <!-- Title -->
+    <h1 class="lecture-title">Lecture 1: Python 基础</h1>
+    <p class="lecture-subtitle">
+        表达式与变量 · 函数定义 · 条件控制 · 高阶函数 (HOF)
+    </p>
+
+    <a class="download-btn" href="lec1-note.pdf" download>&#x1f4c4; 下载讲义 PDF (lec1-note.pdf)</a>
+
+    <!-- ============================================================ -->
+    <section class="section" id="intro">
+        <h2>一、Python 入门</h2>
+
+        <p>Python 是一种广泛使用的<strong>解释型</strong>、高级、通用编程语言。</p>
+
+        <div class="callout callout-key">
+            <strong>解释型 (Interpreted)</strong> 的意思是：Python 会将代码一句一句直接执行，不需要像<strong>编译型</strong>语言（如 C 语言）那样，先经过编译器编译为机器码再运行。
+        </div>
+
+        <h3>在终端中运行 Python</h3>
+
+        <ol>
+            <li>按下 <code>Cmd + Space</code>，搜索 <strong>Terminal</strong>（终端），打开它。</li>
+            <li>输入 <code>python3</code> 并回车，即可启动 Python 解释器。</li>
+        </ol>
+
+        <div class="figure">
+            <img src="images/terminal.png" alt="终端中运行 Python 3">
+            <span class="caption">在终端中启动 Python 3 解释器</span>
+        </div>
+
+        <p>在终端中运行 Python 可以一句一句地交互式执行代码，非常适合初学者学习语法。</p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="section" id="expressions">
+        <h2>二、基本表达式</h2>
+
+        <p>Python 会自动计算每个表达式的值并返回。试着在解释器中输入以下内容：</p>
+
+        <div class="code-block"><code>>>> 2
+2
+>>> -2
+-2</code></div>
+
+        <h3>算术运算</h3>
+
+        <div class="code-block"><code>>>> 1 + 2        <span class="cmt"># 加法</span>
+3
+>>> 3 - 2        <span class="cmt"># 减法</span>
+1
+>>> 2 * 2        <span class="cmt"># 乘法</span>
+4
+>>> 3 / 2        <span class="cmt"># 除法（浮点数）</span>
+1.5
+>>> 3 // 2       <span class="cmt"># 整除（向下取整）</span>
+1
+>>> 5 % 3        <span class="cmt"># 取余（模运算）</span>
+2</code></div>
+
+        <div class="callout callout-hint">
+            <code>//</code> 是整除（floor division），<code>%</code> 是取余（modulo）。这两个运算符在实际编程中非常常用。
+        </div>
+
+        <h3>布尔表达式</h3>
+
+        <div class="code-block"><code>>>> 3 == 2       <span class="cmt"># 等于判断</span>
+<span class="kw">False</span>
+>>> 2 < 3        <span class="cmt"># 小于比较</span>
+<span class="kw">True</span>
+>>> 3 != 2       <span class="cmt"># 不等于</span>
+<span class="kw">True</span>
+>>> 5 >= 5       <span class="cmt"># 大于等于</span>
+<span class="kw">True</span></code></div>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="section" id="variables">
+        <h2>三、变量与值绑定</h2>
+
+        <p>Python 中的变量将名称与值绑定在一起。等号（<code>=</code>）是<strong>赋值</strong>运算符，而不是数学意义上的等式。</p>
+
+        <div class="code-block"><code>>>> x = 3
+>>> x
+3
+>>> 2 * x
+6
+>>> x = x + 2    <span class="cmt"># 将 x 重新绑定到 x + 2</span>
+>>> x
+5</code></div>
+
+        <div class="callout callout-warn">
+            <strong>&#x26A0; 注意：</strong> 在 Python 中，<code>x = x + 2</code> 的意思是：取出 <code>x</code> 当前的值，加上 2，再将名称 <code>x</code> 绑定到新结果。这<strong>不是</strong>代数方程，而是一系列计算步骤。
+        </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="section" id="functions">
+        <h2>四、函数</h2>
+
+        <p>函数是对输入到输出的映射：<em>f(x)</em>。Python 中有很多内置函数（如 <code>max</code>、<code>min</code>、<code>abs</code>），同时你也可以自定义函数。</p>
+
+        <h3>定义简单函数</h3>
+
+        <div class="code-block"><code>>>> <span class="kw">def</span> <span class="fn">add_one</span>(x):
+...     <span class="kw">return</span> x + 1
+...
+>>> add_one(3)
+4
+>>> add_one(5)
+6
+>>> add_one(add_one(3))    <span class="cmt"># 嵌套函数调用</span>
+5</code></div>
+
+        <div class="code-block"><code>>>> <span class="kw">def</span> <span class="fn">square</span>(x):
+...     <span class="kw">return</span> x * x
+...
+>>> square(3)
+9
+>>> square(add_one(3))     <span class="cmt"># square(4) = 16</span>
+16</code></div>
+
+        <h3>多参数函数</h3>
+
+        <div class="code-block"><code>>>> <span class="kw">def</span> <span class="fn">x_plus_y</span>(x, y):
+...     <span class="kw">return</span> x + y
+...
+>>> x_plus_y(1, 2)
+3</code></div>
+
+        <h3>函数也是值</h3>
+
+        <p>Python 中的函数是<strong>一等公民</strong> —— 你可以像绑定数字一样，将函数绑定到变量名：</p>
+
+        <div class="code-block"><code>>>> s = square
+>>> s(2)
+4</code></div>
+
+        <div class="callout callout-note">
+            这一点至关重要——函数可以作为值被传递和操作，这是后续学习<strong>高阶函数</strong>的基础。
+        </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="section" id="conditionals">
+        <h2>五、条件控制语句</h2>
+
+        <h3><code>print</code> 函数</h3>
+
+        <p>在深入条件语句之前，先来理解 <code>print</code>。<code>print</code> 的<strong>功能</strong>是在屏幕上打印内容，但它的<strong>返回值</strong>是 <code>None</code>。这两者需要区分开来：</p>
+
+        <div class="code-block"><code>>>> 3
+3
+>>> print(3)
+3
+
+>>> print(print(3))
+3
+<span class="kw">None</span></code></div>
+
+        <div class="callout callout-key">
+            <strong>&#x1F4A1; 关键理解：</strong> <code>3</code> 直接输入会返回 3（由解释器显示出来），而 <code>print(3)</code> 虽然也显示了 3，但那是 <code>print</code> 的<strong>副作用</strong>；<code>print</code> 本身的返回值是 <code>None</code>。<br><br>
+            <code>print(print(3))</code>：内层 <code>print(3)</code> 打印 3 并返回 <code>None</code>，外层 <code>print</code> 打印这个 <code>None</code>。
+        </div>
+
+        <h3><code>if</code> 语句</h3>
+
+        <p><code>if</code> 会判断后面表达式的值。如果表达式的值为 <code>True</code>，则执行下方缩进的代码块。如果有 <code>else</code> 子句，则当条件为 <code>False</code> 时执行 <code>else</code> 下方的代码块。</p>
+
+        <div class="code-block"><code>>>> <span class="kw">def</span> <span class="fn">python</span>(x):
+...     <span class="kw">if</span> x > 0:
+...             print(<span class="str-color">"positive"</span>)
+...     <span class="kw">else</span>:
+...             print(<span class="str-color">"not positive"</span>)
+...
+>>> python(3)
+positive
+>>> python(-3)
+not positive
+>>> python(0)
+not positive</code></div>
+
+        <h3><code>elif</code> 子句</h3>
+
+        <p><code>elif</code>（即 "else if" 的缩写）可以串联多个条件。Python 会按顺序依次检查每个条件，<strong>第一个</strong>为 <code>True</code> 的条件对应的代码块会被执行，其余则被跳过。如果所有条件都不满足，则执行 <code>else</code>（如果有的话）。</p>
+
+        <div class="code-block"><code>>>> <span class="kw">def</span> <span class="fn">abs</span>(x):
+...     <span class="kw">if</span> x > 0:
+...             <span class="kw">return</span> x
+...     <span class="kw">elif</span> x == 0:       <span class="cmt"># 此处仅为演示 elif 语法</span>
+...             <span class="kw">return</span> x        <span class="cmt"># 实际可简化为 if x >= 0</span>
+...     <span class="kw">else</span>:
+...             <span class="kw">return</span> -x
+...
+>>> abs(3)
+3
+>>> abs(-3)
+3</code></div>
+
+        <div class="callout callout-hint">
+            上面 <code>elif x == 0</code> 的分支<strong>并不是必需的</strong> —— 这里只是为了演示 <code>elif</code> 的写法。实际使用中，前两种情况可以直接合并为 <code>if x >= 0</code>。
+        </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="section" id="hof">
+        <h2>六、高阶函数 (Higher-Order Functions)</h2>
+
+        <p><em>这是本节课最具挑战性的部分。</em></p>
+
+        <p><strong>高阶函数</strong>（Higher-Order Function，简称 HOF）是指<strong>接收另一个函数作为参数</strong>和/或<strong>返回一个函数作为结果</strong>的函数。函数和数字一样，是可以被传递和操作的值。</p>
+
+        <h3>函数作为参数</h3>
+
+        <div class="code-block"><code>>>> <span class="kw">def</span> <span class="fn">square</span>(x):
+...     <span class="kw">return</span> x * x
+...
+>>> <span class="kw">def</span> <span class="fn">cube</span>(x):
+...     <span class="kw">return</span> x * x * x
+...
+>>> square(2)
+4
+>>> cube(2)
+8</code></div>
+
+        <p>将一个函数作为参数传递给另一个函数：</p>
+
+        <div class="code-block"><code>>>> <span class="kw">def</span> <span class="fn">apply</span>(x, f):
+...     <span class="kw">return</span> f(x)
+...
+>>> apply(3, cube)          <span class="cmt"># cube(3) = 27</span>
+27
+>>> apply(4, square)        <span class="cmt"># square(4) = 16</span>
+16</code></div>
+
+        <div class="callout callout-key">
+            <strong>&#x1F4A1; 关键理解：</strong> <code>apply</code> 并不关心 <code>f</code> 具体做了什么 —— 它只是用 <code>x</code> 去调用 <code>f</code>，然后返回结果。这种抽象让我们可以编写通用的、可复用的代码。
+        </div>
+
+        <h3>函数作为返回值（闭包）</h3>
+
+        <p>高阶函数真正的威力在于：一个函数可以<strong>返回</strong>另一个函数。</p>
+
+        <div class="code-block"><code>>>> <span class="kw">def</span> <span class="fn">make_adder</span>(n):
+...     <span class="kw">def</span> <span class="fn">adder</span>(x):
+...         <span class="kw">return</span> x + n
+...     <span class="kw">return</span> adder
+...
+>>> add_3 = make_adder(3)
+>>> add_3(3)                <span class="cmt"># 3 + 3</span>
+6
+>>> add_3(6)                <span class="cmt"># 6 + 3</span>
+9
+>>> add_5 = make_adder(5)
+>>> add_5(5)                <span class="cmt"># 5 + 5</span>
+10</code></div>
+
+        <div class="callout callout-warn">
+            <strong>&#x1F9E0; 这是怎么做到的？</strong> 内部函数 <code>adder</code> 会"记住"它被创建时 <code>n</code> 的值。这种机制被称为<strong>闭包 (Closure)</strong> —— 编程中最强大的概念之一。<br><br>
+            • <code>add_3 = make_adder(3)</code> → adder 记住了 <code>n=3</code> → <code>add_3(x) = x + 3</code><br>
+            • <code>add_5 = make_adder(5)</code> → adder 记住了 <code>n=5</code> → <code>add_5(x) = x + 5</code>
+        </div>
+
+        <h3>可视化代码执行</h3>
+
+        <p>为了更直观地理解函数和闭包的运行过程，强烈建议使用以下交互式可视化工具：</p>
+
+        <p style="text-align:center;font-size:16px;margin:16px 0;">
+            &#x1F517; <a href="https://pythontutor.com/cp/composingprograms.html#mode=edit" target="_blank" rel="noopener">pythontutor.com</a>
+        </p>
+
+        <p>将代码粘贴进去，逐行执行，就能看到 Python 是如何计算表达式、绑定变量以及管理函数调用的。</p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="section" id="summary">
+        <h2>七、本讲小结</h2>
+
+        <ul>
+            <li><strong>基本表达式</strong> —— 数字、算术运算（<code>+ - * / // %</code>）和布尔运算（<code>== != &lt; &gt;</code>）</li>
+            <li><strong>变量</strong> —— 用赋值运算符 <code>=</code> 将名称与值绑定；<code>x = x + 2</code> 是重新绑定</li>
+            <li><strong>函数</strong> —— 用 <code>def</code> 和 <code>return</code> 定义可复用的计算单元</li>
+            <li><strong>函数即值</strong> —— 可以将函数绑定到变量名（<code>s = square</code>）</li>
+            <li><strong>条件控制</strong> —— 用 <code>if</code>、<code>elif</code> 和 <code>else</code> 控制程序流程</li>
+            <li><strong>print 与 return</strong> —— <code>print</code> 有副作用但返回 <code>None</code>；<code>return</code> 返回计算结果</li>
+            <li><strong>高阶函数 (HOF)</strong> —— 接收或返回函数的函数；内部函数"记住"创建时变量的值即为<strong>闭包</strong></li>
+        </ul>
+
+        <div class="callout callout-note" style="margin-top:24px;">
+            <strong>&#x1F4D6; 延伸学习：</strong> 推荐使用 <a href="https://pythontutor.com/cp/composingprograms.html#mode=edit" target="_blank" rel="noopener">PythonTutor</a> 可视化工具辅助理解函数调用和闭包的运行机制。将 <code>make_adder</code> 的代码粘贴进去，逐步执行，观察每一行代码对程序状态的影响。
+        </div>
+    </section>
+
+</main>
+
+</body>
+</html>
