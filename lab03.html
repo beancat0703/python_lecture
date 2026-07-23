@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab 3: Sequences, Recursion — bean_cat's Python Lecture</title>
+    <style>
+        /* ===== Reset & Base ===== */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --sidebar-width: 260px;
+            --topbar-height: 56px;
+            --gray-50:  #f8f9fa;
+            --gray-100: #f0f1f3;
+            --gray-200: #e2e4e7;
+            --gray-300: #cdd0d5;
+            --gray-400: #aeb3ba;
+            --gray-500: #858c94;
+            --gray-600: #5f666f;
+            --gray-700: #3d4248;
+            --gray-800: #2a2e33;
+            --gray-900: #1a1c1f;
+            --accent:   #3a5a8c;
+            --accent-light: #e8edf4;
+            --font-serif: 'Noto Serif SC', 'Source Han Serif SC', 'STSong', 'SimSun', 'Songti SC', 'NSimSun', 'FangSong', serif;
+            --font-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', 'Cascadia Code', 'Menlo', 'Monaco', 'Consolas', monospace;
+            --font-sans:  -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            color: var(--gray-900);
+            background: var(--gray-50);
+            line-height: 1.7;
+            min-height: 100vh;
+        }
+
+        /* ===== Top Bar ===== */
+        .topbar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: var(--topbar-height);
+            background: var(--gray-700);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            padding: 0 28px;
+            z-index: 100;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+        }
+        .topbar .brand {
+            font-family: var(--font-mono);
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            color: #e8e8e8;
+        }
+        .topbar .brand span { color: #8db5e6; }
+
+        /* ===== Sidebar ===== */
+        .sidebar {
+            position: fixed;
+            top: var(--topbar-height);
+            left: 0;
+            bottom: 0;
+            width: var(--sidebar-width);
+            background: #fff;
+            border-right: 1px solid var(--gray-200);
+            overflow-y: auto;
+            padding: 24px 0;
+            z-index: 90;
+        }
+        .sidebar .toc-header {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--gray-500);
+            padding: 0 24px 16px;
+        }
+        .sidebar .toc-list { list-style: none; }
+        .sidebar .toc-list li a {
+            display: block;
+            padding: 8px 24px;
+            font-size: 14px;
+            color: var(--gray-700);
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: all 0.15s ease;
+        }
+        .sidebar .toc-list li a:hover {
+            background: var(--gray-100);
+            color: var(--gray-900);
+        }
+        .sidebar .toc-list li a.active {
+            border-left-color: var(--accent);
+            background: var(--accent-light);
+            color: var(--accent);
+            font-weight: 600;
+        }
+        .sidebar .toc-list li a .toc-num {
+            display: inline-block;
+            width: 22px;
+            font-weight: 700;
+            color: var(--accent);
+            font-size: 12px;
+        }
+
+        /* ===== Main ===== */
+        .main {
+            margin-left: var(--sidebar-width);
+            margin-top: var(--topbar-height);
+            padding: 40px 52px 80px;
+            max-width: 960px;
+        }
+
+        /* ===== Content Styles ===== */
+        .lecture-title {
+            font-family: var(--font-serif);
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+        .lecture-subtitle {
+            font-size: 14px;
+            color: var(--gray-500);
+            margin-bottom: 40px;
+            font-weight: 400;
+        }
+
+        .section { margin-bottom: 44px; }
+        .section h2 {
+            font-family: var(--font-serif);
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 18px;
+            padding-bottom: 10px;
+            border-bottom: 1.5px solid var(--gray-200);
+        }
+        .section h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin: 20px 0 10px;
+        }
+        .section p, .section li {
+            font-size: 15px;
+            color: var(--gray-800);
+            margin-bottom: 8px;
+        }
+        .section ul, .section ol {
+            margin-left: 24px;
+            margin-bottom: 12px;
+        }
+        .section ul li, .section ol li { margin-bottom: 4px; }
+
+        /* ===== Info/Callout Boxes ===== */
+        .callout {
+            border-radius: 6px;
+            padding: 14px 18px;
+            margin: 16px 0;
+            font-size: 14px;
+            line-height: 1.65;
+        }
+        .callout-note {
+            background: #e8f0fe;
+            border: 1px solid #b8d4fe;
+            color: #1a3a5c;
+        }
+        .callout-note .callout-title { color: #1a4a7a; font-weight: 700; margin-bottom: 6px; }
+        .callout-hint {
+            background: #edf7ed;
+            border: 1px solid #b7d7b7;
+            color: #2e5a2e;
+        }
+        .callout-hint .callout-title { color: #2e5a2e; font-weight: 700; margin-bottom: 6px; }
+        .callout-warn {
+            background: #fff8e8;
+            border: 1px solid #e8d5a0;
+            color: #5c4a1a;
+        }
+        .callout-warn .callout-title { color: #7a5a1a; font-weight: 700; margin-bottom: 6px; }
+
+        /* ===== Code Block ===== */
+        .code-block {
+            background: #1e1e2e;
+            border-radius: 6px;
+            padding: 14px 20px;
+            margin: 12px 0;
+            overflow-x: auto;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+        }
+        .code-block code {
+            font-family: var(--font-mono);
+            font-size: 13.5px;
+            color: #cdd6f4;
+            line-height: 1.6;
+            white-space: pre;
+        }
+        .code-block .kw  { color: #cba6f7; }
+        .code-block .fn  { color: #89b4fa; }
+        .code-block .str { color: #a6e3a1; }
+        .code-block .num { color: #fab387; }
+        .code-block .op  { color: #94e2d5; }
+        .code-block .cmt { color: #6c7086; }
+        .code-block .blk { color: #cdd6f4; }
+        .code-block .prompt { color: #a6e3a1; }
+
+        /* Inline code */
+        :not(.code-block) > code,
+        p code, li code, .callout code {
+            background: var(--gray-100);
+            color: #c44;
+            font-family: var(--font-mono);
+            font-size: 13px;
+            padding: 1.5px 6px;
+            border-radius: 3px;
+            border: 1px solid var(--gray-200);
+        }
+
+        /* ===== Buttons & Links ===== */
+        .download-btn {
+            display: inline-block;
+            background: var(--accent);
+            color: #fff;
+            padding: 8px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            margin: 8px 0 16px;
+            transition: background 0.15s;
+        }
+        .download-btn:hover { background: #2a4a7c; }
+
+        /* ===== Dropdown / Toggle Topics ===== */
+        .topic-toggle {
+            display: block;
+            width: 100%;
+            text-align: left;
+            background: var(--gray-100);
+            border: 1px solid var(--gray-200);
+            border-radius: 6px;
+            padding: 12px 18px;
+            margin: 10px 0;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--gray-800);
+            cursor: pointer;
+            transition: background 0.15s;
+            font-family: var(--font-sans);
+        }
+        .topic-toggle:hover { background: var(--gray-200); }
+        .topic-toggle::before {
+            content: "▸ ";
+            display: inline-block;
+            transition: transform 0.2s;
+            font-size: 12px;
+            margin-right: 4px;
+        }
+        .topic-toggle.open::before { transform: rotate(90deg); }
+        .topic-content {
+            display: none;
+            padding: 8px 18px 16px;
+            border-left: 3px solid var(--gray-200);
+            margin: 0 0 12px 8px;
+        }
+        .topic-content.open { display: block; }
+
+        /* Table styles */
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            font-size: 14px;
+        }
+        .info-table th, .info-table td {
+            border: 1px solid var(--gray-200);
+            padding: 10px 14px;
+            text-align: left;
+        }
+        .info-table th {
+            background: var(--gray-100);
+            font-weight: 700;
+            color: var(--gray-700);
+        }
+        .info-table td { color: var(--gray-800); }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .main { margin-left: 0; padding: 24px 20px 60px; }
+        }
+
+        /* ===== Print ===== */
+        @media print {
+            .sidebar, .topbar { display: none; }
+            .main { margin: 0; padding: 20px 0; }
+            .code-block { box-shadow: none; border: 1px solid #ccc; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Top Bar -->
+<header class="topbar">
+    <div class="brand"><span>bean_cat</span>'s Python Lecture</div>
+</header>
+
+<!-- Sidebar -->
+<nav class="sidebar">
+    <div class="toc-header">目录 Contents</div>
+    <ul class="toc-list">
+        <li><a href="index.html"><span class="toc-num">00</span> Lab 0 — 环境配置</a></li>
+        <li><a href="Lecture1/index.html"><span class="toc-num">L1</span> Lecture 1 — Python 基础</a></li>
+        <li><a href="Lecture2/index.html"><span class="toc-num">L2</span> Lecture 2 — 短路求值, Lambda, 递归</a></li>
+        <li><a href="hw01.html"><span class="toc-num">01</span> HW01 — Functions, Control, Higher-Order Functions</a></li>
+        <li><a href="lab02.html"><span class="toc-num">L2</span> Lab 2 — Higher-Order Functions, Lambda</a></li>
+        <li><a href="lab03.html" class="active"><span class="toc-num">L3</span> Lab 3 — Sequences, Recursion</a></li>
+        <li>
+            <a href="hw02.html">
+                <span class="toc-num">02</span> HW02 — Recursion, Tree Recursion, Sequences
+            </a>
+        </li>    </ul>
+</nav>
+
+<!-- Main Content -->
+<main class="main">
+
+    <h1 class="lecture-title">Lab 3: Sequences, Recursion</h1>
+    <p class="lecture-subtitle">
+        题目来源：CS 61A Summer 2026 —
+        <a href="https://cs61a.org/lab/lab03/" target="_blank" rel="noopener">https://cs61a.org/lab/lab03/</a>
+    </p>
+
+    <a class="download-btn" href="lab03.zip" download>&#x1f4e5; 下载 lab03.zip</a>
+
+    <div class="callout callout-note">
+        <strong>&#x1F4A1; 提示：</strong> 下载并解压后，用 VS Code <strong>打开 lab03 文件夹</strong>（点击 <code>文件</code> → <code>打开文件夹...</code>，选择 lab03 文件夹），而<strong>不是</strong>单独打开某个 .py 文件。这样才能在终端中正确运行 Ok 评测命令。<br><br>
+        在 lab03 文件夹中，你需要编辑 <code>lab03.py</code> 这个文件来完成所有编程题目，其他文件无需修改。
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- Topics -->
+    <section class="section" id="topics">
+        <h2>Topics</h2>
+        <p>如果你需要复习本实验的相关内容，可以查阅以下主题。也可以直接跳转到<a href="#required-questions">必做题目</a>，遇到困难时再回来参考。</p>
+
+        <!-- Topic 1: Lists -->
+        <button class="topic-toggle" id="topic-btn-1" onclick="toggleTopic(1)">Lists（列表）</button>
+        <div class="topic-content" id="topic-1">
+            <p>列表（list）是一种可以存储有序元素集合的数据结构。这些元素可以是任何数据类型，包括数字、字符串，甚至其他列表。在方括号中用逗号分隔的表达式列表即可创建列表：</p>
+            <div class="code-block"><code><span class="op">&gt;&gt;&gt;</span> list_of_values = [<span class="num">2</span>, <span class="num">1</span>, <span class="num">3</span>, <span class="blk">True</span>, <span class="num">3</span>]
+<span class="op">&gt;&gt;&gt;</span> nested_list = [<span class="num">2</span>, [<span class="num">1</span>, <span class="num">3</span>], [<span class="blk">True</span>, [<span class="num">3</span>]]]</code></div>
+            <p>列表中的每个位置都有一个索引，最左侧元素的索引为 <code>0</code>：</p>
+            <div class="code-block"><code><span class="op">&gt;&gt;&gt;</span> list_of_values[<span class="num">0</span>]
+<span class="num">2</span>
+<span class="op">&gt;&gt;&gt;</span> nested_list[<span class="num">1</span>]
+[<span class="num">1</span>, <span class="num">3</span>]</code></div>
+            <p>负索引从末尾开始计数，最右侧元素的索引为 <code>-1</code>：</p>
+            <div class="code-block"><code><span class="op">&gt;&gt;&gt;</span> nested_list[<span class="op">-</span><span class="num">1</span>]
+[<span class="blk">True</span>, [<span class="num">3</span>]]</code></div>
+            <p>列表相加会创建一个包含所有元素的更长列表：</p>
+            <div class="code-block"><code><span class="op">&gt;&gt;&gt;</span> [<span class="num">1</span>, <span class="num">2</span>] <span class="op">+</span> [<span class="num">3</span>] <span class="op">+</span> [<span class="num">4</span>, <span class="num">5</span>]
+[<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>]</code></div>
+        </div>
+
+        <!-- Topic 2: List Comprehensions -->
+        <button class="topic-toggle" id="topic-btn-2" onclick="toggleTopic(2)">List Comprehensions（列表推导式）</button>
+        <div class="topic-content" id="topic-2">
+            <p>列表推导式描述了列表中的元素，并求值为包含这些元素的新列表。</p>
+            <p>有两种形式：</p>
+            <div class="code-block"><code>[<span class="op">&lt;</span>expression<span class="op">&gt;</span> <span class="kw">for</span> <span class="op">&lt;</span>element<span class="op">&gt;</span> <span class="kw">in</span> <span class="op">&lt;</span>sequence<span class="op">&gt;</span>]
+[<span class="op">&lt;</span>expression<span class="op">&gt;</span> <span class="kw">for</span> <span class="op">&lt;</span>element<span class="op">&gt;</span> <span class="kw">in</span> <span class="op">&lt;</span>sequence<span class="op">&gt;</span> <span class="kw">if</span> <span class="op">&lt;</span>conditional<span class="op">&gt;</span>]</code></div>
+            <p>以下示例从 <code>[1, 2, 3, 4]</code> 开始，使用 <code>if i % 2 == 0</code> 选出偶数元素 <code>2</code> 和 <code>4</code>，然后用 <code>i*i</code> 求平方：</p>
+            <div class="code-block"><code><span class="op">&gt;&gt;&gt;</span> [i<span class="op">*</span>i <span class="kw">for</span> i <span class="kw">in</span> [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>] <span class="kw">if</span> i <span class="op">%</span> <span class="num">2</span> <span class="op">==</span> <span class="num">0</span>]
+[<span class="num">4</span>, <span class="num">16</span>]</code></div>
+            <p>这个列表推导式求值为一个列表，包含：</p>
+            <ul>
+                <li><code>i*i</code> 的值</li>
+                <li>对序列 <code>[1, 2, 3, 4]</code> 中的每个元素 <code>i</code></li>
+                <li>满足 <code>i % 2 == 0</code></li>
+            </ul>
+            <p>我们也可以将列表推导式重写为等价的 <code>for</code> 语句：</p>
+            <div class="code-block"><code><span class="op">&gt;&gt;&gt;</span> result = []
+<span class="op">&gt;&gt;&gt;</span> <span class="kw">for</span> i <span class="kw">in</span> [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>]:
+<span class="op">...</span>     <span class="kw">if</span> i <span class="op">%</span> <span class="num">2</span> <span class="op">==</span> <span class="num">0</span>:
+<span class="op">...</span>         result = result <span class="op">+</span> [i<span class="op">*</span>i]
+<span class="op">&gt;&gt;&gt;</span> result
+[<span class="num">4</span>, <span class="num">16</span>]</code></div>
+        </div>
+
+        <!-- Topic 3: For Loops -->
+        <button class="topic-toggle" id="topic-btn-3" onclick="toggleTopic(3)">For Loops（For 循环）</button>
+        <div class="topic-content" id="topic-3">
+            <p><code>for</code> 语句对序列（如列表或 range）中的每个元素执行代码。每次执行时，紧跟 <code>for</code> 的名称会被绑定到序列中不同的元素。</p>
+            <div class="code-block"><code><span class="kw">for</span> <span class="op">&lt;</span>name<span class="op">&gt;</span> <span class="kw">in</span> <span class="op">&lt;</span>expression<span class="op">&gt;</span>:
+    <span class="op">&lt;</span>suite<span class="op">&gt;</span></code></div>
+            <p>首先对 <code>&lt;expression&gt;</code> 求值（必须求值为一个序列），然后按顺序对序列中的每个元素：</p>
+            <ol>
+                <li>将 <code>&lt;name&gt;</code> 绑定到该元素</li>
+                <li>执行 <code>&lt;suite&gt;</code></li>
+            </ol>
+            <p>示例：</p>
+            <div class="code-block"><code><span class="kw">for</span> x <span class="kw">in</span> [<span class="op">-</span><span class="num">1</span>, <span class="num">4</span>, <span class="num">2</span>, <span class="num">0</span>, <span class="num">5</span>]:
+    print(<span class="str">"Current elem:"</span>, x)</code></div>
+            <p>输出：</p>
+            <div class="code-block"><code>Current elem: <span class="op">-</span><span class="num">1</span>
+Current elem: <span class="num">4</span>
+Current elem: <span class="num">2</span>
+Current elem: <span class="num">0</span>
+Current elem: <span class="num">5</span></code></div>
+        </div>
+
+        <!-- Topic 4: Ranges -->
+        <button class="topic-toggle" id="topic-btn-4" onclick="toggleTopic(4)">Ranges（范围）</button>
+        <div class="topic-content" id="topic-4">
+            <p>Range 是一种存储整数序列的数据结构。可以通过以下方式创建：</p>
+            <ul>
+                <li><code>range(stop)</code> 包含 0, 1, ..., <code>stop - 1</code></li>
+                <li><code>range(start, stop)</code> 包含 <code>start</code>, <code>start + 1</code>, ..., <code>stop - 1</code></li>
+            </ul>
+            <p>注意 range 不包含 <code>stop</code> 值；它生成直到但不包括 <code>stop</code> 的数字。</p>
+            <p>例如：</p>
+            <div class="code-block"><code><span class="op">&gt;&gt;&gt;</span> <span class="kw">for</span> i <span class="kw">in</span> range(<span class="num">3</span>):
+<span class="op">...</span>     print(i)
+<span class="num">0</span>
+<span class="num">1</span>
+<span class="num">2</span></code></div>
+            <p>Range 和列表虽然都是序列，但 range 对象不同于列表。可以通过 <code>list()</code> 将 range 转换为列表：</p>
+            <div class="code-block"><code><span class="op">&gt;&gt;&gt;</span> range(<span class="num">3</span>, <span class="num">6</span>)
+range(<span class="num">3</span>, <span class="num">6</span>)  <span class="cmt"># 这是一个 range 对象</span>
+<span class="op">&gt;&gt;&gt;</span> list(range(<span class="num">3</span>, <span class="num">6</span>))
+[<span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>]  <span class="cmt"># list() 将 range 对象转换为列表</span>
+<span class="op">&gt;&gt;&gt;</span> list(range(<span class="num">5</span>))
+[<span class="num">0</span>, <span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>]
+<span class="op">&gt;&gt;&gt;</span> list(range(<span class="num">1</span>, <span class="num">6</span>))
+[<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>]</code></div>
+        </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- Required Questions -->
+    <section class="section" id="required-questions">
+        <h2>必做题 (Required Questions)</h2>
+
+        <div class="callout callout-warn">
+            <div class="callout-title">&#x26A0; 重要</div>
+            对于所有 WWPD 题目，如果答案为 <code>&lt;function...&gt;</code> 请输入 <code>Function</code>；如果出错请输入 <code>Error</code>；如果没有显示任何内容请输入 <code>Nothing</code>。
+        </div>
+
+        <!-- Lists Section -->
+        <h2 id="lists">Lists</h2>
+
+        <!-- Q1 -->
+        <h3 id="q1">Q1: WWPD: Lists &amp; Ranges</h3>
+        <p>使用 Ok 测试你对以下 "What Would Python Display?" 题目的理解：</p>
+        <div class="code-block"><code><span class="prompt">$</span> python3 ok -q lists-wwpd -u</code></div>
+
+        <div class="code-block"><code><span class="op">&gt;&gt;&gt;</span> s = [<span class="num">7</span><span class="op">//</span><span class="num">3</span>, <span class="num">5</span>, [<span class="num">4</span>, <span class="num">0</span>, <span class="num">1</span>], <span class="num">2</span>]
+<span class="op">&gt;&gt;&gt;</span> s[<span class="num">0</span>]
+<span class="cmt">______</span>
+<span class="op">&gt;&gt;&gt;</span> s[<span class="num">2</span>]
+<span class="cmt">______</span>
+<span class="op">&gt;&gt;&gt;</span> s[<span class="op">-</span><span class="num">1</span>]
+<span class="cmt">______</span>
+<span class="op">&gt;&gt;&gt;</span> len(s)
+<span class="cmt">______</span>
+<span class="op">&gt;&gt;&gt;</span> <span class="num">4</span> <span class="kw">in</span> s
+<span class="cmt">______</span>
+<span class="op">&gt;&gt;&gt;</span> <span class="num">4</span> <span class="kw">in</span> s[<span class="num">2</span>]
+<span class="cmt">______</span>
+<span class="op">&gt;&gt;&gt;</span> s[<span class="num">2</span>] <span class="op">+</span> [<span class="num">3</span> <span class="op">+</span> <span class="num">2</span>]
+<span class="cmt">______</span>
+<span class="op">&gt;&gt;&gt;</span> <span class="num">5</span> <span class="kw">in</span> s[<span class="num">2</span>]
+<span class="cmt">______</span>
+<span class="op">&gt;&gt;&gt;</span> s[<span class="num">2</span>] <span class="op">*</span> <span class="num">2</span>
+<span class="cmt">______</span>
+<span class="op">&gt;&gt;&gt;</span> list(range(<span class="num">3</span>, <span class="num">6</span>))
+<span class="cmt">______</span>
+<span class="op">&gt;&gt;&gt;</span> range(<span class="num">3</span>, <span class="num">6</span>)
+<span class="cmt">______</span>
+<span class="op">&gt;&gt;&gt;</span> r = range(<span class="num">3</span>, <span class="num">6</span>)
+<span class="op">&gt;&gt;&gt;</span> [r[<span class="num">0</span>], r[<span class="num">2</span>]]
+<span class="cmt">______</span>
+<span class="op">&gt;&gt;&gt;</span> range(<span class="num">4</span>)[<span class="op">-</span><span class="num">1</span>]
+<span class="cmt">______</span></code></div>
+
+        <!-- Q2 -->
+        <h3 id="q2">Q2: Flatten</h3>
+        <p>编写一个函数 <code>flatten</code>，接收一个列表 <code>s</code>，返回<strong>一个新列表</strong>，它是 <code>s</code> 的 "展平" 版本。你不应修改原始列表。</p>
+
+        <div class="callout callout-hint">
+            <div class="callout-title">&#x1F4A1; 注意</div>
+            输入的列表可能深层嵌套，即列表中可能有多个嵌套层级。确保你的方案支持这一点。<br><br>
+            <strong>提示：</strong>可以使用内置的 <code>type</code> 函数检查某物是否为列表：
+            <div class="code-block"><code><span class="op">&gt;&gt;&gt;</span> type(<span class="num">3</span>) <span class="op">==</span> list
+<span class="blk">False</span>
+<span class="op">&gt;&gt;&gt;</span> type([<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>]) <span class="op">==</span> list
+<span class="blk">True</span></code></div>
+        </div>
+
+        <div class="code-block"><code><span class="kw">def</span> <span class="fn">flatten</span>(s: list) <span class="op">-&gt;</span> list:
+    <span class="str">"""Returns a flattened version of list s.
+
+    >>> flatten([1, 2, 3])
+    [1, 2, 3]
+    >>> deep = [1, [[2], 3], 4, [5, 6]]
+    >>> flatten(deep)
+    [1, 2, 3, 4, 5, 6]
+    >>> deep                                # input list is unchanged
+    [1, [[2], 3], 4, [5, 6]]
+    >>> very_deep = [['m', ['i', ['n', ['m', 'e', ['w', 't', ['a'], 't', 'i', 'o'], 'n']], 's']]
+    >>> flatten(very_deep)
+    ['m', 'i', 'n', 'm', 'e', 'w', 't', 'a', 't', 'i', 'o', 'n', 's']
+    """</span>
+    <span class="str">"*** YOUR CODE HERE ***"</span></code></div>
+
+        <p>使用 Ok 测试代码：</p>
+        <div class="code-block"><code><span class="prompt">$</span> python3 ok -q flatten</code></div>
+
+        <!-- List Comprehensions Section -->
+        <h2 id="list-comprehensions">List Comprehensions</h2>
+
+        <!-- Q3 -->
+        <h3 id="q3">Q3: WWPD: List Comprehensions</h3>
+        <p>使用 Ok 测试你对以下 "What Would Python Display?" 题目的理解：</p>
+        <div class="code-block"><code><span class="prompt">$</span> python3 ok -q list-comprehensions-wwpd -u</code></div>
+
+        <div class="code-block"><code><span class="op">&gt;&gt;&gt;</span> [<span class="num">2</span> <span class="op">*</span> x <span class="kw">for</span> x <span class="kw">in</span> range(<span class="num">4</span>)]
+<span class="cmt">______</span>
+<span class="op">&gt;&gt;&gt;</span> [y <span class="kw">for</span> y <span class="kw">in</span> [<span class="num">6</span>, <span class="num">1</span>, <span class="num">6</span>, <span class="num">1</span>] <span class="kw">if</span> y <span class="op">&gt;</span> <span class="num">2</span>]
+<span class="cmt">______</span>
+<span class="op">&gt;&gt;&gt;</span> [[<span class="num">1</span>] <span class="op">+</span> s <span class="kw">for</span> s <span class="kw">in</span> [[<span class="num">4</span>], [<span class="num">5</span>, <span class="num">6</span>]]]
+<span class="cmt">______</span>
+<span class="op">&gt;&gt;&gt;</span> [z <span class="op">+</span> <span class="num">1</span> <span class="kw">for</span> z <span class="kw">in</span> range(<span class="num">10</span>) <span class="kw">if</span> z <span class="op">%</span> <span class="num">3</span> <span class="op">==</span> <span class="num">0</span>]
+<span class="cmt">______</span></code></div>
+
+        <!-- Q4 -->
+        <h3 id="q4">Q4: Close List</h3>
+        <p>实现 <code>close_list</code>，接收一个整数列表 <code>s</code> 和一个非负整数 <code>k</code>。返回 <code>s</code> 中与其索引相差不超过 <code>k</code> 的元素列表。即元素与其索引之差的绝对值小于或等于 <code>k</code>。</p>
+
+        <div class="code-block"><code><span class="kw">def</span> <span class="fn">close_list</span>(s: list[int], k: int) <span class="op">-&gt;</span> list[int]:
+    <span class="str">"""Return a list of the elements of s that are within k of their index.
+
+    >>> t = [6, 2, 4, 3, 5]
+    >>> close_list(t, 0)  # Only 3 is equal to its index
+    [3]
+    >>> close_list(t, 1)  # 2, 3, and 5 are within 1 of their index
+    [2, 3, 5]
+    >>> close_list(t, 2)  # 2, 3, 4, and 5 are all within 2 of their index
+    [2, 4, 3, 5]
+    """</span>
+    <span class="kw">assert</span> k <span class="op">&gt;=</span> <span class="num">0</span>
+    <span class="kw">return</span> [___ <span class="kw">for</span> i <span class="kw">in</span> range(len(s)) <span class="kw">if</span> ___]</code></div>
+
+        <p>使用 Ok 测试代码：</p>
+        <div class="code-block"><code><span class="prompt">$</span> python3 ok -q close_list</code></div>
+
+        <!-- Recursion Section -->
+        <h2 id="recursion">Recursion</h2>
+
+        <!-- Q5 -->
+        <h3 id="q5">Q5: Sorting a List</h3>
+        <p>排序是计算机科学中非常重要的课题。让我们用递归来排序一个列表。</p>
+        <p>首先，编写函数 <code>remove_first</code>，接收列表 <code>lst</code>，删除数字 <code>elem</code> 的<strong>第一次</strong>出现。</p>
+
+        <div class="code-block"><code><span class="kw">def</span> <span class="fn">remove_first</span>(lst: list, elem: int) <span class="op">-&gt;</span> list:
+    <span class="str">"""This function removes the first appearance of elem in list lst.
+
+    >>> remove_first([3, 4], 3)
+    [4]
+    >>> remove_first([3, 4, 3], 3)
+    [4, 3]
+    >>> remove_first([2, 4], 3)
+    [2, 4]
+    >>> remove_first([], 0)
+    []
+    """</span>
+    <span class="str">"*** YOUR CODE HERE ***"</span></code></div>
+
+        <p>使用 Ok 测试代码：</p>
+        <div class="code-block"><code><span class="prompt">$</span> python3 ok -q remove_first</code></div>
+
+        <p>接下来，编写函数 <code>sort</code>，接收列表 <code>lst</code> 并返回该列表的排序版本。<strong>请使用递归！</strong></p>
+
+        <div class="callout callout-hint">
+            <div class="callout-title">&#x1F4A1; 提示</div>
+            使用你刚刚定义的 <code>remove_first</code> 函数以及内置的 <code>min</code> 函数。
+        </div>
+
+        <div class="code-block"><code><span class="kw">def</span> <span class="fn">sort</span>(lst: list) <span class="op">-&gt;</span> list:
+    <span class="str">"""This function returns a sorted version of the list lst.
+
+    >>> sort([6, 2, 5])
+    [2, 5, 6]
+    >>> sort([2, 3])
+    [2, 3]
+    >>> sort([3])
+    [3]
+    >>> sort([])
+    []
+    """</span>
+    <span class="str">"*** YOUR CODE HERE ***"</span></code></div>
+
+        <p>使用 Ok 测试代码：</p>
+        <div class="code-block"><code><span class="prompt">$</span> python3 ok -q sort</code></div>
+
+        <!-- Q6 -->
+        <h3 id="q6">Q6: Making Onions</h3>
+        <p>编写函数 <code>make_onion</code>，接收两个单参数函数 <code>f</code> 和 <code>g</code>。它返回一个接收三个参数 <code>x</code>、<code>y</code> 和 <code>limit</code> 的函数。返回的函数在可以用最多 <code>limit</code> 次对 <code>f</code> 和 <code>g</code> 的调用从 <code>x</code> 到达 <code>y</code> 时返回 <code>True</code>，否则返回 <code>False</code>。</p>
+
+        <p>例如，如果 <code>f</code> 加 1，<code>g</code> 翻倍，则可以通过四次调用从 5 到达 25：<code>f(g(g(f(5))))</code>。</p>
+
+        <div class="code-block"><code><span class="kw">def</span> <span class="fn">make_onion</span>(f, g):
+    <span class="str">"""Return a function can_reach(x, y, limit) that returns
+    whether some call expression containing only f, g, and x with
+    up to limit calls will give the result y.
+
+    >>> up = lambda x: x + 1
+    >>> double = lambda y: y * 2
+    >>> can_reach = make_onion(up, double)
+    >>> can_reach(5, 25, 4)      # 25 = up(double(double(up(5))))
+    True
+    >>> can_reach(5, 25, 3)      # Not possible
+    False
+    >>> can_reach(1, 1, 0)      # 1 = 1
+    True
+    >>> add_ing = lambda x: x + "ing"
+    >>> add_end = lambda y: y + "end"
+    >>> can_reach_string = make_onion(add_ing, add_end)
+    >>> can_reach_string("cry", "crying", 1)      # "crying" = add_ing("cry")
+    True
+    >>> can_reach_string("un", "unending", 3)     # "unending" = add_ing(add_end("un"))
+    True
+    >>> can_reach_string("peach", "folding", 4)   # Not possible
+    False
+    """</span>
+    <span class="kw">def</span> <span class="fn">can_reach</span>(x, y, limit: int) <span class="op">-&gt;</span> bool:
+        <span class="kw">if</span> limit <span class="op">&lt;</span> <span class="num">0</span>:
+            <span class="kw">return</span> ____
+        <span class="kw">elif</span> x <span class="op">==</span> y:
+            <span class="kw">return</span> ____
+        <span class="kw">else</span>:
+            <span class="kw">return</span> can_reach(____, ____, limit <span class="op">-</span> <span class="num">1</span>) <span class="kw">or</span> can_reach(____, ____, limit <span class="op">-</span> <span class="num">1</span>)
+    <span class="kw">return</span> can_reach</code></div>
+
+        <p>使用 Ok 测试代码：</p>
+        <div class="code-block"><code><span class="prompt">$</span> python3 ok -q make_onion</code></div>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="section" id="score">
+        <h2>本地检查分数 (Check Your Score Locally)</h2>
+        <p>你可以通过运行以下命令在本地检查每道题目的得分：</p>
+        <div class="code-block"><code><span class="prompt">$</span> python3 ok --score</code></div>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="section" id="optional">
+        <h2>选做题 (Optional Questions)</h2>
+
+        <div class="callout callout-note">
+            <strong>&#x1F4A1; 提示：</strong> 以下题目为选做。如果不完成这些题目，你仍然可以获得本次实验的学分。但它们是非常好的练习，推荐尝试！
+        </div>
+
+        <!-- Q7 -->
+        <h3 id="q7">Q7: Function Repeater</h3>
+        <p>定义函数 <code>make_func_repeater</code>，接收一个单参数函数 <code>f</code> 和一个整数 <code>x</code>。它应返回另一个接收一个整数参数的函数。该函数返回将 <code>f</code> 应用于 <code>x</code> 指定次数后的结果。</p>
+        <p>请确保使用<strong>递归</strong>来解题。</p>
+
+        <div class="code-block"><code><span class="kw">def</span> <span class="fn">make_func_repeater</span>(f, x: int):
+    <span class="str">"""
+    >>> incr_repeater = make_func_repeater(lambda x: x + 1, 1)
+    >>> incr_repeater(2) # same as f(f(x))
+    3
+    >>> incr_repeater(5)
+    6
+    """</span>
+    <span class="kw">def</span> <span class="fn">repeat</span>(____):
+        <span class="kw">if</span> ____:
+            <span class="kw">return</span> ____
+        <span class="kw">else</span>:
+            <span class="kw">return</span> ____
+    <span class="kw">return</span> ____</code></div>
+
+        <p>使用 Ok 测试代码：</p>
+        <div class="code-block"><code><span class="prompt">$</span> python3 ok -q make_func_repeater</code></div>
+
+        <!-- Q8 -->
+        <h3 id="q8">Q8: Ten-Pairs</h3>
+        <p>编写一个函数，接收一个正整数 <code>n</code>，返回其中包含的 ten-pair 个数。ten-pair 是 <code>n</code> 中一对和为 10 的数字。</p>
+        <p>例如，数字 7,823,952 有 3 个 ten-pair。第一位和第四位之和为 7+3=10，第二位和第三位之和为 8+2=10，第二位和最后一位之和为 8+2=10。</p>
+        <ul>
+            <li>一个数字可以参与多个 ten-pair。</li>
+            <li>一个 5 不能和自己组成 ten-pair。</li>
+        </ul>
+
+        <div class="callout callout-hint">
+            <div class="callout-title">&#x1F4A1; 推荐</div>
+            完成并使用辅助函数 <code>count_digit</code> 来计算某个数字在 <code>n</code> 中出现的次数。
+        </div>
+
+        <div class="callout callout-warn">
+            <div class="callout-title">&#x26A0; 重要</div>
+            必须使用<strong>递归</strong>；如果使用任何循环（for, while），测试将失败。
+        </div>
+
+        <div class="code-block"><code><span class="kw">def</span> <span class="fn">ten_pairs</span>(n: int) <span class="op">-&gt;</span> int:
+    <span class="str">"""Return the number of ten-pairs within positive integer n.
+
+    >>> ten_pairs(7823952)
+    3
+    >>> ten_pairs(55055)
+    6
+    >>> ten_pairs(9641469)
+    6
+    >>> # ban iteration
+    >>> from construct_check import check
+    >>> check(SOURCE_FILE, 'ten_pairs', ['While', 'For'])
+    True
+    """</span>
+    <span class="str">"*** YOUR CODE HERE ***"</span>
+
+<span class="kw">def</span> <span class="fn">count_digit</span>(n: int, digit: int) <span class="op">-&gt;</span> int:
+    <span class="str">"""Return how many times digit appears in n.
+
+    >>> count_digit(55055, 5)
+    4
+    >>> from construct_check import check
+    >>> # ban iteration
+    >>> check(SOURCE_FILE, 'count_digit', ['While', 'For'])
+    True
+    """</span>
+    <span class="str">"*** YOUR CODE HERE ***"</span></code></div>
+
+        <p>使用 Ok 测试代码：</p>
+        <div class="code-block"><code><span class="prompt">$</span> python3 ok -q ten_pairs</code></div>
+    </section>
+
+</main>
+
+<script>
+function toggleTopic(n) {
+    var content = document.getElementById('topic-' + n);
+    var btn = document.getElementById('topic-btn-' + n);
+    if (content.classList.contains('open')) {
+        content.classList.remove('open');
+        btn.classList.remove('open');
+    } else {
+        content.classList.add('open');
+        btn.classList.add('open');
+    }
+}
+</script>
+
+</body>
+</html>

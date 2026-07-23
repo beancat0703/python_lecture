@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lecture 2 — bean_cat's Python Lecture</title>
+    <style>
+        /* ===== Reset & Base ===== */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --sidebar-width: 260px;
+            --topbar-height: 56px;
+            --gray-50:  #f8f9fa;
+            --gray-100: #f0f1f3;
+            --gray-200: #e2e4e7;
+            --gray-300: #cdd0d5;
+            --gray-400: #aeb3ba;
+            --gray-500: #858c94;
+            --gray-600: #5f666f;
+            --gray-700: #3d4248;
+            --gray-800: #2a2e33;
+            --gray-900: #1a1c1f;
+            --accent:   #3a5a8c;
+            --accent-light: #e8edf4;
+            --font-serif: 'Noto Serif SC', 'Source Han Serif SC', 'STSong', 'SimSun', 'Songti SC', 'NSimSun', 'FangSong', serif;
+            --font-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', 'Cascadia Code', 'Menlo', 'Monaco', 'Consolas', monospace;
+            --font-sans:  -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            color: var(--gray-900);
+            background: var(--gray-50);
+            line-height: 1.7;
+            min-height: 100vh;
+        }
+
+        /* ===== Top Bar ===== */
+        .topbar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: var(--topbar-height);
+            background: var(--gray-700);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            padding: 0 28px;
+            z-index: 100;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+        }
+        .topbar .brand {
+            font-family: var(--font-mono);
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            color: #e8e8e8;
+        }
+        .topbar .brand span { color: #8db5e6; }
+
+        /* ===== Sidebar ===== */
+        .sidebar {
+            position: fixed;
+            top: var(--topbar-height);
+            left: 0;
+            bottom: 0;
+            width: var(--sidebar-width);
+            background: #fff;
+            border-right: 1px solid var(--gray-200);
+            overflow-y: auto;
+            padding: 24px 0;
+            z-index: 90;
+        }
+        .sidebar .toc-header {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--gray-500);
+            padding: 0 24px 16px;
+        }
+        .sidebar .toc-list { list-style: none; }
+        .sidebar .toc-list li a {
+            display: block;
+            padding: 8px 24px;
+            font-size: 14px;
+            color: var(--gray-700);
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: all 0.15s ease;
+        }
+        .sidebar .toc-list li a:hover {
+            background: var(--gray-100);
+            color: var(--gray-900);
+        }
+        .sidebar .toc-list li a.active {
+            border-left-color: var(--accent);
+            background: var(--accent-light);
+            color: var(--accent);
+            font-weight: 600;
+        }
+        .sidebar .toc-list li a .toc-num {
+            display: inline-block;
+            width: 22px;
+            font-weight: 700;
+            color: var(--accent);
+            font-size: 12px;
+        }
+
+        /* ===== Main ===== */
+        .main {
+            margin-left: var(--sidebar-width);
+            margin-top: var(--topbar-height);
+            padding: 40px 52px 80px;
+            max-width: 960px;
+        }
+
+        /* ===== Content Styles ===== */
+        .lecture-title {
+            font-family: var(--font-serif);
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+        .lecture-subtitle {
+            font-size: 14px;
+            color: var(--gray-500);
+            margin-bottom: 40px;
+            font-weight: 400;
+        }
+
+        .section { margin-bottom: 44px; }
+        .section h2 {
+            font-family: var(--font-serif);
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 18px;
+            padding-bottom: 10px;
+            border-bottom: 1.5px solid var(--gray-200);
+        }
+        .section h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin: 20px 0 10px;
+        }
+        .section p, .section li {
+            font-size: 15px;
+            color: var(--gray-800);
+            margin-bottom: 8px;
+        }
+        .section ul, .section ol {
+            margin-left: 24px;
+            margin-bottom: 12px;
+        }
+        .section ul li, .section ol li { margin-bottom: 4px; }
+
+        /* ===== Info/Callout Boxes ===== */
+        .callout {
+            border-radius: 6px;
+            padding: 14px 18px;
+            margin: 16px 0;
+            font-size: 14px;
+            line-height: 1.65;
+        }
+        .callout-note {
+            background: #e8f0fe;
+            border: 1px solid #b8d4fe;
+            color: #1a3a5c;
+        }
+        .callout-hint {
+            background: #edf7ed;
+            border: 1px solid #b7d7b7;
+            color: #2e5a2e;
+        }
+        .callout-warn {
+            background: #fff8e8;
+            border: 1px solid #e8d5a0;
+            color: #5c4a1a;
+        }
+        .callout-key {
+            background: #f5f0ff;
+            border: 1px solid #d4c8f0;
+            color: #3a2a5c;
+        }
+
+        /* ===== Code Block ===== */
+        .code-block {
+            background: #1e1e2e;
+            border-radius: 6px;
+            padding: 14px 20px;
+            margin: 12px 0;
+            overflow-x: auto;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+        }
+        .code-block code {
+            font-family: var(--font-mono);
+            font-size: 13.5px;
+            color: #cdd6f4;
+            line-height: 1.6;
+            white-space: pre;
+        }
+        .code-block .kw  { color: #cba6f7; }
+        .code-block .fn  { color: #89b4fa; }
+        .code-block .str-color { color: #a6e3a1; }
+        .code-block .num { color: #fab387; }
+        .code-block .op  { color: #94e2d5; }
+        .code-block .cmt { color: #6c7086; }
+        .code-block .prompt { color: #a6e3a1; }
+
+        /* Inline code */
+        :not(.code-block) > code,
+        p code, li code, .callout code {
+            background: var(--gray-100);
+            color: #c44;
+            font-family: var(--font-mono);
+            font-size: 13px;
+            padding: 1.5px 6px;
+            border-radius: 3px;
+            border: 1px solid var(--gray-200);
+        }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .main { margin-left: 0; padding: 24px 20px 60px; }
+        }
+
+        /* ===== Print ===== */
+        @media print {
+            .sidebar, .topbar { display: none; }
+            .main { margin: 0; padding: 20px 0; }
+            .code-block { box-shadow: none; border: 1px solid #ccc; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Top Bar -->
+<header class="topbar">
+    <div class="brand"><span>bean_cat</span>'s Python Lecture</div>
+</header>
+
+<!-- Sidebar -->
+<nav class="sidebar">
+    <div class="toc-header">目录 Contents</div>
+    <ul class="toc-list">
+        <li><a href="../index.html"><span class="toc-num">00</span> Lab 0 — 环境配置</a></li>
+        <li><a href="../Lecture1/index.html"><span class="toc-num">L1</span> Lecture 1 — Python 基础</a></li>
+        <li><a href="index.html" class="active"><span class="toc-num">L2</span> Lecture 2 — 短路求值, Lambda, 递归</a></li>
+        <li><a href="../hw01.html"><span class="toc-num">01</span> HW01 — Functions, Control, HOF</a></li>
+        <li><a href="../lab02.html"><span class="toc-num">L2</span> Lab 2 — Higher-Order Functions, Lambda</a></li>
+        <li><a href="../lab03.html"><span class="toc-num">L3</span> Lab 3 — Sequences, Recursion</a></li>
+        <li><a href="../hw02.html"><span class="toc-num">02</span> HW02 — Recursion, Tree Recursion, Sequences</a></li>
+    </ul>
+</nav>
+
+<!-- Main Content -->
+<main class="main">
+
+    <h1 class="lecture-title">Lecture 2: 短路求值, Lambda 表达式与递归</h1>
+    <p class="lecture-subtitle">
+        Short Circuiting &middot; Lambda Expressions &middot; Recursion
+    </p>
+
+    <!-- ============================================================ -->
+    <section class="section" id="short-circuiting">
+        <h2>Topic 1: Short Circuiting（短路求值）</h2>
+
+        <h3>认识 and 与 or</h3>
+
+        <p>在 Python 中，<code>and</code> 和 <code>or</code> 是逻辑运算符。先回顾它们在布尔逻辑中的含义：</p>
+
+        <ul>
+            <li><code>and</code> —— 两端都为 <code>True</code> 时，结果才为 <code>True</code></li>
+            <li><code>or</code> —— 只要有一端为 <code>True</code>，结果就为 <code>True</code></li>
+        </ul>
+
+        <div class="callout callout-key">
+            <strong>Python 中的 truthy 与 falsy：</strong> 在 Python 中，非零数字、非空字符串、非空列表等都视为 <code>True</code>（称为 truthy）；而 <code>0</code>、<code>None</code>、<code>""</code>（空字符串）、<code>[]</code>（空列表）等视为 <code>False</code>（称为 falsy）。你可以用 <code>bool()</code> 函数来检测任何值的真假：
+
+            <div class="code-block"><code><span class="op">>>></span> bool(<span class="num">0</span>)
+<span class="kw">False</span>
+<span class="op">>>></span> bool(<span class="num">-1</span>)
+<span class="kw">True</span>
+<span class="op">>>></span> bool(<span class="str-color">""</span>)
+<span class="kw">False</span>
+<span class="op">>>></span> bool(<span class="str-color">"hello"</span>)
+<span class="kw">True</span></code></div>
+        </div>
+
+        <h3>and/or 实际返回什么？</h3>
+
+        <p>这是很多初学者容易忽略的关键点：<code>and</code> 和 <code>or</code> <strong>并不一定返回 <code>True</code> 或 <code>False</code></strong>。它们的真实行为是：</p>
+
+        <ul>
+            <li><code>and</code> —— 从左到右求值，返回<strong>第一个 falsy 值</strong>；如果所有值都是 truthy，则返回<strong>最后一个值</strong></li>
+            <li><code>or</code> —— 从左到右求值，返回<strong>第一个 truthy 值</strong>；如果所有值都是 falsy，则返回<strong>最后一个值</strong></li>
+        </ul>
+
+        <div class="code-block"><code><span class="op">>>></span> <span class="num">3</span> <span class="kw">and</span> <span class="num">5</span>        <span class="cmt"># 两个都是 truthy，返回最后一个</span>
+<span class="num">5</span>
+<span class="op">>>></span> <span class="num">0</span> <span class="kw">and</span> <span class="num">5</span>        <span class="cmt"># 0 是 falsy，直接返回 0</span>
+<span class="num">0</span>
+<span class="op">>>></span> <span class="num">0</span> <span class="kw">or</span> <span class="str-color">"hello"</span>   <span class="cmt"># 0 是 falsy，继续求值；"hello" 是 truthy，返回它</span>
+<span class="str-color">'hello'</span>
+<span class="op">>>></span> <span class="str-color">""</span> <span class="kw">or</span> <span class="num">0</span>       <span class="cmt"># 两个都是 falsy，返回最后一个</span>
+<span class="num">0</span></code></div>
+
+        <div class="callout callout-warn">
+            <strong>一句话总结：</strong> <code>and</code> 和 <code>or</code> 总是返回它们<strong>最后一个被求值的操作数</strong>，不管是否发生了短路。这个行为在 CS 61A 考试中经常出现。
+        </div>
+
+        <h3>短路是如何发生的？</h3>
+
+        <p>Python 的 <code>and</code> 和 <code>or</code> 运算符会<strong>短路求值</strong>（short-circuit）：它们不一定会对每个操作数求值。一旦已经能确定整个表达式的结果，就不再继续求值。</p>
+
+        <p>来看一个典型例子——除以 0 会引发错误：</p>
+
+        <div class="code-block"><code><span class="op">>>></span> <span class="num">1</span> <span class="op">/</span> <span class="num">0</span>
+<span class="blk">Traceback (most recent call last):</span>
+<span class="blk">  File "</span><span class="op">&lt;</span>stdin<span class="op">&gt;</span><span class="blk">", line 1, in </span><span class="op">&lt;</span>module<span class="op">&gt;</span>
+<span class="blk">ZeroDivisionError: division by zero</span></code></div>
+
+        <p>但如果用 <code>or</code> 连接，由于短路，<code>1 / 0</code> 根本不会被求值：</p>
+
+        <div class="code-block"><code><span class="op">>>></span> <span class="kw">True</span> <span class="kw">or</span> <span class="num">1</span> <span class="op">/</span> <span class="num">0</span>
+<span class="kw">True</span></code></div>
+
+        <p>这是因为 <code>or</code> 从左到右求值，当看到 <code>True</code>（第一个 truthy 值）时，它已经知道整个表达式为真，后面的 <code>1 / 0</code> 就不会被执行了。</p>
+
+        <p>相反，<code>and</code> 的短路方向不同——当遇到第一个 falsy 值时停止：</p>
+
+        <div class="code-block"><code><span class="op">>>></span> <span class="kw">False</span> <span class="kw">and</span> <span class="num">1</span> <span class="op">/</span> <span class="num">0</span>    <span class="cmt"># False 是 falsy，短路，1/0 不执行</span>
+<span class="kw">False</span>
+<span class="op">>>></span> <span class="kw">True</span> <span class="kw">and</span> <span class="num">1</span> <span class="op">/</span> <span class="num">0</span>     <span class="cmt"># True 是 truthy，继续求值，然后报错！</span>
+<span class="blk">ZeroDivisionError: division by zero</span></code></div>
+
+        <div class="callout callout-note">
+            <strong>记住两个方向：</strong>
+            <ul style="margin-top:6px;">
+                <li><code>or</code> 遇到第一个 truthy 就停（后面不执行）</li>
+                <li><code>and</code> 遇到第一个 falsy 就停（后面不执行）</li>
+            </ul>
+        </div>
+
+        <h3>实战例题</h3>
+
+        <p>分析下面每个表达式的结果，想想运算符优先级和短路规则：</p>
+
+        <div class="code-block"><code><span class="op">>>></span> <span class="op">-</span><span class="num">1</span> <span class="kw">and</span> <span class="num">1</span> <span class="op">></span> <span class="num">0</span>
+<span class="kw">True</span></code></div>
+
+        <div class="callout callout-hint">
+            <strong>解析：</strong> 比较运算符 <code>></code> 的优先级高于 <code>and</code>，所以先算 <code>1 > 0</code> 得到 <code>True</code>。然后变成 <code>-1 and True</code>——<code>-1</code> 是 truthy，<code>and</code> 继续求值，返回最后一个值 <code>True</code>。
+        </div>
+
+        <p>再看一个带函数调用的例子：</p>
+
+        <div class="code-block"><code><span class="op">>>></span> <span class="kw">def</span> <span class="fn">f</span>(x):
+<span class="op">...</span>     <span class="kw">if</span> x <span class="op">==</span> <span class="num">0</span>:
+<span class="op">...</span>         <span class="kw">return</span> <span class="str-color">"zero"</span>
+<span class="op">...</span>     <span class="kw">elif</span> x <span class="op">></span> <span class="num">0</span>:
+<span class="op">...</span>         <span class="kw">return</span> <span class="str-color">"positive"</span>
+<span class="op">...</span>     <span class="kw">else</span>:
+<span class="op">...</span>         <span class="kw">return</span> <span class="str-color">""</span>
+<span class="op">>>></span> <span class="num">0</span> <span class="kw">or</span> f(<span class="num">1</span>)       <span class="cmt"># 0 是 falsy，继续执行 f(1)</span>
+<span class="str-color">'positive'</span>
+<span class="op">>>></span> f(<span class="num">0</span>) <span class="kw">or</span> f(<span class="op">-</span><span class="num">1</span>)    <span class="cmt"># f(0) 返回 "zero"（truthy），短路，f(-1) 不执行</span>
+<span class="str-color">'zero'</span>
+<span class="op">>>></span> f(<span class="num">0</span>) <span class="kw">and</span> f(<span class="op">-</span><span class="num">1</span>)   <span class="cmt"># f(0) 返回 "zero"（truthy），and 继续；f(-1) 返回 ""（falsy）</span>
+<span class="str-color">''</span></code></div>
+
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="section" id="lambda">
+        <h2>Topic 2: Lambda Expressions（Lambda 表达式）</h2>
+
+        <p>Lambda 表达式是 Python 中创建匿名函数的简洁方式。它的语法只需要两个部分：</p>
+
+        <div class="code-block"><code><span class="kw">lambda</span> <span class="op">&lt;</span>parameters<span class="op">&gt;</span>: <span class="op">&lt;</span>return expression<span class="op">&gt;</span></code></div>
+
+        <h3>基本用法</h3>
+
+        <p>下面这行代码创建了一个匿名函数，输入 <code>x</code>，返回 <code>x * x</code>：</p>
+
+        <div class="code-block"><code><span class="op">>>></span> <span class="kw">lambda</span> x: x <span class="op">*</span> x
+<span class="op"><</span>function <span class="op"><</span>lambda<span class="op">></span> at 0x105079800<span class="op">></span></code></div>
+
+        <p>因为 lambda 表达式本身<strong>不求值就不会做任何事</strong>，通常我们会把它赋值给一个变量，或者直接作为参数传递：</p>
+
+        <div class="code-block"><code><span class="op">>>></span> square = <span class="kw">lambda</span> x: x <span class="op">*</span> x
+<span class="op">>>></span> square(<span class="num">3</span>)
+<span class="num">9</span></code></div>
+
+        <p>多参数的 lambda 也是可以的：</p>
+
+        <div class="code-block"><code><span class="op">>>></span> add = <span class="kw">lambda</span> x, y: x <span class="op">+</span> y
+<span class="op">>>></span> add(<span class="num">2</span>, <span class="num">3</span>)
+<span class="num">5</span></code></div>
+
+        <h3>Lambda 与高阶函数的结合</h3>
+
+        <p>Lambda 表达式最常见的用途是作为参数传递给高阶函数。回顾 Lecture 1 中学过的 <code>apply</code> 函数：</p>
+
+        <div class="code-block"><code><span class="op">>>></span> <span class="kw">def</span> <span class="fn">apply</span>(x, f):
+<span class="op">...</span>     <span class="kw">return</span> f(x)
+<span class="op">...</span>
+<span class="op">>>></span> apply(<span class="num">3</span>, <span class="kw">lambda</span> x: x <span class="op">*</span> x)    <span class="cmt"># 不需要先定义 square，直接传入 lambda</span>
+<span class="num">9</span>
+<span class="op">>>></span> apply(<span class="num">5</span>, <span class="kw">lambda</span> x: x <span class="op">+</span> <span class="num">10</span>)
+<span class="num">15</span></code></div>
+
+        <p>Lambda 也可以接收另一个函数作为参数：</p>
+
+        <div class="code-block"><code><span class="op">>>></span> negate = <span class="kw">lambda</span> f, x: <span class="op">-</span>f(x)
+<span class="op">>>></span> negate(<span class="kw">lambda</span> x: x <span class="op">*</span> x, <span class="num">3</span>)     <span class="cmt"># 对 square(3) 取负</span>
+<span class="op">-</span><span class="num">9</span></code></div>
+
+        <h3>Lambda vs. def</h3>
+
+        <p><code>lambda</code> 和 <code>def</code> 都能创建函数，但它们有重要区别：</p>
+
+        <table class="info-table" style="width:100%;border-collapse:collapse;margin:16px 0;font-size:14px;">
+            <tr>
+                <th style="border:1px solid var(--gray-200);padding:10px 14px;text-align:left;background:var(--gray-100);font-weight:700;color:var(--gray-700);"></th>
+                <th style="border:1px solid var(--gray-200);padding:10px 14px;text-align:left;background:var(--gray-100);font-weight:700;color:var(--gray-700);">lambda</th>
+                <th style="border:1px solid var(--gray-200);padding:10px 14px;text-align:left;background:var(--gray-100);font-weight:700;color:var(--gray-700);">def</th>
+            </tr>
+            <tr>
+                <td style="border:1px solid var(--gray-200);padding:10px 14px;color:var(--gray-800);"><strong>类型</strong></td>
+                <td style="border:1px solid var(--gray-200);padding:10px 14px;color:var(--gray-800);">表达式（可以出现在任何需要表达式的地方）</td>
+                <td style="border:1px solid var(--gray-200);padding:10px 14px;color:var(--gray-800);">语句（会改变当前环境）</td>
+            </tr>
+            <tr>
+                <td style="border:1px solid var(--gray-200);padding:10px 14px;color:var(--gray-800);"><strong>名称</strong></td>
+                <td style="border:1px solid var(--gray-200);padding:10px 14px;color:var(--gray-800);">创建匿名函数，没有内在名称</td>
+                <td style="border:1px solid var(--gray-200);padding:10px 14px;color:var(--gray-800);">创建函数并将其绑定到指定名称</td>
+            </tr>
+            <tr>
+                <td style="border:1px solid var(--gray-200);padding:10px 14px;color:var(--gray-800);"><strong>函数体</strong></td>
+                <td style="border:1px solid var(--gray-200);padding:10px 14px;color:var(--gray-800);">只能是<strong>单个表达式</strong>，不能包含语句</td>
+                <td style="border:1px solid var(--gray-200);padding:10px 14px;color:var(--gray-800);">可以包含多条语句、赋值、循环等</td>
+            </tr>
+        </table>
+
+        <div class="callout callout-warn">
+            <strong>Lambda 的关键限制：</strong> lambda 函数体只能是<strong>一个表达式</strong>，不能有 <code>if</code> 语句、<code>for</code> 循环、赋值语句等。如果逻辑比较复杂，就应该使用 <code>def</code> 而不是 lambda。
+        </div>
+
+        <p>对比以下两种等价写法：</p>
+
+        <div class="code-block"><code><span class="cmt"># 使用 def —— 有名称，函数体可以是多条语句</span>
+<span class="kw">def</span> <span class="fn">square</span>(x):
+    <span class="kw">return</span> x <span class="op">*</span> x
+
+<span class="cmt"># 使用 lambda —— 匿名，函数体只能是一个表达式</span>
+square = <span class="kw">lambda</span> x: x <span class="op">*</span> x</code></div>
+
+        <p>两者的结果完全相同：<code>square(3)</code> 都会返回 <code>9</code>。</p>
+
+        <p>Lambda 还可以嵌套返回 lambda，形成链式的高阶函数：</p>
+
+        <div class="code-block"><code><span class="op">>>></span> make_adder = <span class="kw">lambda</span> n: <span class="kw">lambda</span> x: x <span class="op">+</span> n
+<span class="op">>>></span> add_3 = make_adder(<span class="num">3</span>)
+<span class="op">>>></span> add_3(<span class="num">5</span>)
+<span class="num">8</span></code></div>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="section" id="recursion">
+        <h2>Topic 3: Recursion（递归）</h2>
+
+        <h3>为什么需要递归？</h3>
+
+        <p>在 Lecture 1 和之前的实验中，我们已经学过了 <code>while</code> 循环来做重复操作。但有一些古老的编程语言（如 Scheme）中是没有 <code>while</code>、<code>for</code> 等循环语句的——它们只能通过<strong>递归</strong>来解决重复计算的问题。即使是在 Python 中，递归也是一种非常重要且优雅的问题解决方式。</p>
+
+        <p><strong>递归</strong>指的是一个函数在内部<strong>调用自己</strong>。一个递归函数通常包含三个要素：</p>
+
+        <ol>
+            <li><strong>Base Case（基准情况）</strong>—— 最简单的、不需要继续递归的情况，让函数知道什么时候停止。一个递归函数可能有一个或多个 base case。</li>
+            <li><strong>Recursive Call（递归调用）</strong>—— 函数调用自身，但每次处理一个<strong>更小</strong>或<strong>更简单</strong>的问题。也可能有一个或多个。</li>
+            <li><strong>Solve the Bigger Problem（解决更大的问题）</strong>—— 利用递归调用的结果，组合出最终答案。</li>
+        </ol>
+
+        <h3>示例 1：阶乘 (Factorial)</h3>
+
+        <p><em>n!</em> 的定义：<em>n! = n &times; (n-1) &times; ... &times; 1</em>，特别地，<em>0! = 1</em>。</p>
+
+        <p>先用你已经熟悉的 <code>while</code> 循环来实现：</p>
+
+        <div class="code-block"><code><span class="kw">def</span> <span class="fn">factorial_iterative</span>(n):
+    ans = <span class="num">1</span>
+    i = <span class="num">1</span>
+    <span class="kw">while</span> i <span class="op"><=</span> n:
+        ans = ans <span class="op">*</span> i
+        i <span class="op">+=</span> <span class="num">1</span>
+    <span class="kw">return</span> ans</code></div>
+
+        <p>再用递归来实现——关键思路：<em>n! = n &times; (n-1)!</em>。这就把问题分解成了"当前数字"加上"更小规模的阶乘"：</p>
+
+        <div class="code-block"><code><span class="kw">def</span> <span class="fn">factorial_recursive</span>(n):
+    <span class="kw">if</span> n <span class="op">==</span> <span class="num">0</span>:              <span class="cmt"># Base Case</span>
+        <span class="kw">return</span> <span class="num">1</span>
+    <span class="kw">else</span>:                      <span class="cmt"># Recursive Call + Solve</span>
+        <span class="kw">return</span> n <span class="op">*</span> factorial_recursive(n <span class="op">-</span> <span class="num">1</span>)</code></div>
+
+        <p>递归的执行过程（以 <code>factorial_recursive(4)</code> 为例）：</p>
+
+        <div class="code-block"><code>factorial_recursive(<span class="num">4</span>)
+  <span class="num">4</span> <span class="op">*</span> factorial_recursive(<span class="num">3</span>)
+        <span class="num">3</span> <span class="op">*</span> factorial_recursive(<span class="num">2</span>)
+              <span class="num">2</span> <span class="op">*</span> factorial_recursive(<span class="num">1</span>)
+                    <span class="num">1</span> <span class="op">*</span> factorial_recursive(<span class="num">0</span>)
+                          <span class="kw">return</span> <span class="num">1</span>       <span class="cmt"># Base Case: 到达最底层</span>
+                    <span class="kw">return</span> <span class="num">1</span> <span class="op">*</span> <span class="num">1</span> = <span class="num">1</span>   <span class="cmt"># 开始逐层返回</span>
+              <span class="kw">return</span> <span class="num">2</span> <span class="op">*</span> <span class="num">1</span> = <span class="num">2</span>
+        <span class="kw">return</span> <span class="num">3</span> <span class="op">*</span> <span class="num">2</span> = <span class="num">6</span>
+  <span class="kw">return</span> <span class="num">4</span> <span class="op">*</span> <span class="num">6</span> = <span class="num">24</span></code></div>
+
+        <div class="callout callout-note">
+            <strong>为什么 base case 用 n == 0 而不是 n == 1？</strong> 因为 <em>0! = 1</em>（数学定义）。如果 base case 只写 <code>n == 1</code>，那么 <code>factorial_recursive(0)</code> 会无限递归下去。
+        </div>
+
+        <h3>示例 2：斐波那契数列 (Fibonacci)</h3>
+
+        <p>斐波那契数列的定义：从 0 和 1 开始，后面的每一项都是前两项之和：</p>
+
+        <div class="code-block"><code>0, 1, 1, 2, 3, 5, 8, 13, 21, 34, ...</code></div>
+
+        <p>数学定义：</p>
+        <ul>
+            <li><em>fib(0) = 0</em></li>
+            <li><em>fib(1) = 1</em></li>
+            <li><em>fib(n) = fib(n-1) + fib(n-2)</em>（n &ge; 2）</li>
+        </ul>
+
+        <p>用递归来实现：</p>
+
+        <div class="code-block"><code><span class="kw">def</span> <span class="fn">fib</span>(n):
+    <span class="kw">if</span> n <span class="op">==</span> <span class="num">0</span>:             <span class="cmt"># Base Case 1</span>
+        <span class="kw">return</span> <span class="num">0</span>
+    <span class="kw">elif</span> n <span class="op">==</span> <span class="num">1</span>:          <span class="cmt"># Base Case 2</span>
+        <span class="kw">return</span> <span class="num">1</span>
+    <span class="kw">else</span>:                    <span class="cmt"># Recursive Call</span>
+        <span class="kw">return</span> fib(n <span class="op">-</span> <span class="num">1</span>) <span class="op">+</span> fib(n <span class="op">-</span> <span class="num">2</span>)</code></div>
+
+        <div class="callout callout-key">
+            <strong>注意：</strong> 这里采用了国际通用的 0-indexed 定义：<code>fib(0) = 0, fib(1) = 1</code>。你会发现 <code>fib</code> 有两个 base case——这是因为每一项都需要前两项的值，必须有两个"起点"。
+        </div>
+
+        <p>强烈建议使用 <a href="https://pythontutor.com/cp/composingprograms.html#mode=edit" target="_blank" rel="noopener">PythonTutor</a> 来可视化 fib 的递归调用树——你会看到函数调用如何逐层展开，以及同一个子问题是如何被重复计算的。</p>
+
+        <h3>示例 3：数位求和 (Sum Digits)</h3>
+
+        <p>问题：给定一个非负整数，计算其各位数字之和。例如 <code>sum_digits(2026) = 2 + 0 + 2 + 6 = 10</code>。</p>
+
+        <p>递归思路：每次取出最后一位数字（<code>n % 10</code>），然后将剩余部分（<code>n // 10</code>）递归处理：</p>
+
+        <div class="code-block"><code>sum_digits(<span class="num">2026</span>):  <span class="num">202</span> 的最后一位 <span class="num">6</span>   <span class="op">+</span>  sum_digits(<span class="num">202</span>)
+sum_digits(<span class="num">202</span>):   <span class="num">20</span> 的最后一位 <span class="num">2</span>   <span class="op">+</span>  sum_digits(<span class="num">20</span>)
+sum_digits(<span class="num">20</span>):    <span class="num">2</span> 的最后一位 <span class="num">0</span>    <span class="op">+</span>  sum_digits(<span class="num">2</span>)
+sum_digits(<span class="num">2</span>):     <span class="cmt"># n < 10, Base Case → return 2</span></code></div>
+
+        <div class="code-block"><code><span class="kw">def</span> <span class="fn">sum_digits</span>(n):
+    <span class="kw">if</span> n <span class="op"><</span> <span class="num">10</span>:            <span class="cmt"># Base Case: 只剩一位数字</span>
+        <span class="kw">return</span> n
+    <span class="kw">else</span>:                   <span class="cmt"># Recursive Call</span>
+        <span class="kw">return</span> sum_digits(n <span class="op">//</span> <span class="num">10</span>) <span class="op">+</span> (n <span class="op">%</span> <span class="num">10</span>)</code></div>
+
+        <h3>示例 4：Cascade —— 理解递归的执行顺序</h3>
+
+        <p>下面这个函数能帮助你直观理解递归调用的<strong>顺序</strong>——注意 <code>print</code> 分别在递归调用前后各出现一次：</p>
+
+        <div class="code-block"><code><span class="kw">def</span> <span class="fn">cascade</span>(n):
+    <span class="kw">if</span> n <span class="op"><</span> <span class="num">10</span>:
+        print(n)
+    <span class="kw">else</span>:
+        print(n)              <span class="cmt"># 递归前打印（向下拆解）</span>
+        cascade(n <span class="op">//</span> <span class="num">10</span>)      <span class="cmt"># 递归调用</span>
+        print(n)              <span class="cmt"># 递归后打印（向上返回）</span></code></div>
+
+        <p>执行 <code>cascade(123)</code> 的输出：</p>
+
+        <div class="code-block"><code><span class="num">123</span>
+<span class="num">12</span>
+<span class="num">1</span>
+<span class="num">12</span>
+<span class="num">123</span></code></div>
+
+        <div class="callout callout-key">
+            <strong>发生了什么？</strong> 第一个 <code>print(n)</code> 在<strong>每次递归调用之前</strong>执行，所以数字从大到小打印（123 &rarr; 12 &rarr; 1）。到达 base case 后，递归开始<strong>逐层返回</strong>，第二个 <code>print(n)</code> 在每次返回时执行，所以数字从小到大地打印回来（12 &rarr; 123）。这展示了递归的"向下分解"和"向上返回"两个阶段。
+        </div>
+
+        <h3>递归 vs. 循环</h3>
+
+        <table class="info-table" style="width:100%;border-collapse:collapse;margin:16px 0;font-size:14px;">
+            <tr>
+                <th style="border:1px solid var(--gray-200);padding:10px 14px;text-align:left;background:var(--gray-100);font-weight:700;color:var(--gray-700);">递归 (Recursion)</th>
+                <th style="border:1px solid var(--gray-200);padding:10px 14px;text-align:left;background:var(--gray-100);font-weight:700;color:var(--gray-700);">循环 (Iteration)</th>
+            </tr>
+            <tr>
+                <td style="border:1px solid var(--gray-200);padding:10px 14px;color:var(--gray-800);">函数调用自身来重复计算</td>
+                <td style="border:1px solid var(--gray-200);padding:10px 14px;color:var(--gray-800);">通过 <code>while</code> 或 <code>for</code> 重复执行代码块</td>
+            </tr>
+            <tr>
+                <td style="border:1px solid var(--gray-200);padding:10px 14px;color:var(--gray-800);">需要 base case 来终止</td>
+                <td style="border:1px solid var(--gray-200);padding:10px 14px;color:var(--gray-800);">需要循环条件来终止</td>
+            </tr>
+            <tr>
+                <td style="border:1px solid var(--gray-200);padding:10px 14px;color:var(--gray-800);">思路更接近数学定义，代码更简洁</td>
+                <td style="border:1px solid var(--gray-200);padding:10px 14px;color:var(--gray-800);">通常执行效率更高（无函数调用开销）</td>
+            </tr>
+        </table>
+
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="section" id="summary">
+        <h2>本讲小结</h2>
+
+        <ul>
+            <li><strong>短路求值</strong> —— <code>or</code> 遇到第一个 truthy 值即停止；<code>and</code> 遇到第一个 falsy 值即停止。它们返回的是<strong>最后一个被求值的操作数</strong>，而不一定是 <code>True/False</code></li>
+            <li><strong>Lambda 表达式</strong> —— 创建匿名函数的简洁方式：<code>lambda 参数: 返回表达式</code>。函数体只能是单个表达式，适合简短的计算逻辑</li>
+            <li><strong>Lambda vs. def</strong> —— lambda 是表达式（到处可用），def 是语句（绑定名称）；lambda 没有内在名称，def 有</li>
+            <li><strong>递归</strong> —— 函数调用自身来解决问题。三个要素：Base Case（何时停止）、Recursive Call（缩小问题规模）、Solve（组合结果）。很多问题（如阶乘、斐波那契）用递归表达比循环更自然</li>
+            <li><strong>递归的执行</strong> —— 有"向下分解"和"向上返回"两个阶段（cascade 函数清晰地展示了这一点）</li>
+        </ul>
+
+        <div class="callout callout-note" style="margin-top:24px;">
+            <strong>延伸学习：</strong> 推荐使用 <a href="https://pythontutor.com/cp/composingprograms.html#mode=edit" target="_blank" rel="noopener">PythonTutor</a> 可视化工具辅助理解递归调用树。将 <code>fib</code> 或 <code>factorial_recursive</code> 的代码粘贴进去，逐步执行，观察每次递归调用时参数如何缩小，以及返回值如何层层向上传递。
+        </div>
+    </section>
+
+</main>
+
+</body>
+</html>

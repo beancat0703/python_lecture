@@ -281,8 +281,28 @@
             </a>
         </li>
         <li>
+            <a href="Lecture2/index.html">
+                <span class="toc-num">L2</span> Lecture 2 — 短路求值, Lambda, 递归
+            </a>
+        </li>
+        <li>
             <a href="hw01.html">
                 <span class="toc-num">01</span> HW01 — Functions, Control, Higher-Order Functions
+            </a>
+        </li>
+        <li>
+            <a href="lab02.html">
+                <span class="toc-num">L2</span> Lab 2 — Higher-Order Functions, Lambda
+            </a>
+        </li>
+        <li>
+            <a href="lab03.html">
+                <span class="toc-num">L3</span> Lab 3 — Sequences, Recursion
+            </a>
+        </li>
+        <li>
+            <a href="hw02.html">
+                <span class="toc-num">02</span> HW02 — Recursion, Tree Recursion, Sequences
             </a>
         </li>
     </ul>
@@ -402,6 +422,49 @@
 
         <div class="success-note">
             环境配置成功！你已经完成了 Python 开发环境的搭建。
+        </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="section" id="tips">
+        <h2>&#x1F4A1; 实用小贴士 (Tips)</h2>
+
+        <div class="callout callout-warn" style="background:#fff8e8;border:1px solid #e8d5a0;color:#5c4a1a;border-radius:6px;padding:14px 18px;margin:16px 0;font-size:14px;line-height:1.65;">
+            <strong>&#x1F4BB; 1. Windows 系统运行 Python</strong><br><br>
+            如果你是 Windows 系统，在终端中输入 <code>python3</code> 可能无法运行。请尝试使用 <code>python</code> 或 <code>py</code> 替代。例如：
+
+            <div class="code-block"><code><span class="prompt">C:\Users\...</span> python ok -q a_plus_abs_b</code></div>
+        </div>
+
+        <div class="callout callout-note" style="background:#e8f0fe;border:1px solid #b8d4fe;color:#1a3a5c;border-radius:6px;padding:14px 18px;margin:16px 0;font-size:14px;line-height:1.65;">
+            <strong>&#x1F50C; 2. Ok 本地测试（无需联网）</strong><br><br>
+            第一次使用 Ok 测试时，终端可能会提示你输入邮箱。如果输入邮箱后仍<strong>无法进行测试</strong>（例如网络问题），可以在 Ok 命令后添加 <code>--local</code> 参数来本地运行测试：
+
+            <div class="code-block"><code><span class="prompt">$</span> python3 ok -q a_plus_abs_b --local</code></div>
+
+            这样 Ok 就不会尝试连接服务器，直接在本机运行测试。
+        </div>
+
+        <div class="callout callout-hint" style="background:#edf7ed;border:1px solid #b7d7b7;color:#2e5a2e;border-radius:6px;padding:14px 18px;margin:16px 0;font-size:14px;line-height:1.65;">
+            <strong>&#x1F9EA; 3. 交互式测试代码</strong><br><br>
+            在 VS Code 写作业时，你可以在终端中使用 <code>-i</code> 参数进入 Python 交互式环境，方便随时测试你写的函数：
+
+            <div class="code-block"><code><span class="prompt">$</span> python3 -i hw01.py</code></div>
+
+            进入后，你会看到 <code>&gt;&gt;&gt;</code> 提示符，可以直接调用你定义的函数来测试结果。例如：
+
+            <div class="code-block"><code><span class="op">&gt;&gt;&gt;</span> a_plus_abs_b(<span class="num">2</span>, <span class="op">-</span><span class="num">3</span>)
+        <span class="num">5</span>
+        <span class="op">&gt;&gt;&gt;</span> hailstone(<span class="num">10</span>)
+        <span class="num">10</span>
+        <span class="num">5</span>
+        <span class="num">16</span>
+        <span class="num">8</span>
+        <span class="num">4</span>
+        <span class="num">2</span>
+        <span class="num">1</span></code></div>
+
+            修改代码后重新加载：输入 <code>exit()</code> 退出，然后再次运行 <code>python3 -i hw01.py</code> 即可。这个技巧<strong>非常实用</strong>，推荐你养成习惯！
         </div>
     </section>
 
